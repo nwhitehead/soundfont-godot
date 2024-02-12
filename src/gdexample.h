@@ -1,23 +1,24 @@
-#ifndef GDSOUNDFONT_H
-#define GDSOUNDFONT_H
+#ifndef SOUNDFONT_H
+#define SOUNDFONT_H
 
 #include <godot_cpp/classes/node.hpp>
 
 namespace godot {
 
-class GDSoundFont : public Node {
-	GDCLASS(GDSoundFont, Node)
+class SoundFont : public Node {
+	GDCLASS(SoundFont, Node)
 
 private:
 	double time_passed;
     float mix_rate;
+    String filename;
 
 protected:
 	static void _bind_methods();
 
 public:
-	GDSoundFont();
-	~GDSoundFont();
+	SoundFont();
+	~SoundFont();
 
 	void _process(double delta) override;
     void set_mix_rate(float mix_rate);

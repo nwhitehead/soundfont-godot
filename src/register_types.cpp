@@ -13,7 +13,7 @@ void initialize_example_module(ModuleInitializationLevel p_level) {
 		return;
 	}
 
-	ClassDB::register_class<GDSoundFont>();
+	ClassDB::register_class<SoundFont>();
 }
 
 extern "C" {

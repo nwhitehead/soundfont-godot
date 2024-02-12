@@ -1,3 +1,7 @@
+[icons]
+
+SoundFont = "res://icon.svg"
+
 [configuration]
 
 entry_symbol = "example_library_init"
