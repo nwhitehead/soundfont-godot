@@ -2,5 +2,4 @@
 
 [node name="Main" type="Node2D"]
 
-[node name="GDExample" type="GDExample" parent="."]
-position = Vector2(5.89984, 13.1158)
+[node name="GDSoundFont" type="GDSoundFont" parent="."]
