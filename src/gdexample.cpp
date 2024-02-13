@@ -30,24 +30,6 @@ PackedByteArray SoundFont::get_data() const {
     return result;
 }
 
-void SoundFontGenerator::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("set_mix_rate", "hz"), &SoundFontGenerator::set_mix_rate);
-    ClassDB::bind_method(D_METHOD("get_mix_rate"), &SoundFontGenerator::get_mix_rate);
-    ClassDB::bind_method(D_METHOD("set_soundfont", "soundfont"), &SoundFontGenerator::set_soundfont);
-    ClassDB::bind_method(D_METHOD("get_soundfont"), &SoundFontGenerator::get_soundfont);
-    ClassDB::bind_method(D_METHOD("set_stereo", "stereo"), &SoundFontGenerator::set_stereo);
-    ClassDB::bind_method(D_METHOD("get_stereo"), &SoundFontGenerator::get_stereo);
-    ClassDB::bind_method(D_METHOD("set_gain", "gain"), &SoundFontGenerator::set_gain);
-    ClassDB::bind_method(D_METHOD("get_gain"), &SoundFontGenerator::get_gain);
-    ClassDB::bind_method(D_METHOD("set_volume", "volume"), &SoundFontGenerator::set_volume);
-    ClassDB::bind_method(D_METHOD("get_volume"), &SoundFontGenerator::get_volume);
-    ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "soundfont", PROPERTY_HINT_RESOURCE_TYPE, "SoundFont"), "set_soundfont", "get_soundfont");
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "mix_rate", PROPERTY_HINT_RANGE, "20,192000,1,suffix:Hz"), "set_mix_rate", "get_mix_rate");
-    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "stereo"), "set_stereo", "get_stereo");
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "gain", PROPERTY_HINT_RANGE, "-22.0,22.0,0.1,suffix:dB"), "set_gain", "get_gain");
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "volume", PROPERTY_HINT_RANGE, "0.0,1.0,0.01,suffix:"), "set_volume", "get_volume");
-}
-
 SoundFontGenerator::SoundFontGenerator() {
     // Initialize any variables here.
     time_passed = 0.0f;
@@ -131,4 +113,48 @@ float SoundFontGenerator::get_volume() const {
 
 void SoundFontGenerator::_process(double delta) {
     time_passed += delta;
+}
+
+int SoundFontGenerator::get_presetindex(int bank, int preset_number) const {
+    if (!generator) {
+        return -1;
+    }
+    return tsf_get_presetindex(generator, bank, preset_number);
+}
+
+int SoundFontGenerator::get_presetcount() const {
+    if (!generator) {
+        return -1;
+    }
+    return tsf_get_presetcount(generator);
+}
+
+String SoundFontGenerator::get_presetname(int preset_number) const {
+    if (!generator) {
+        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontGenerator");
+        return String("");
+    }
+    return String(tsf_get_presetname(generator, preset_number));
+}
+
+void SoundFontGenerator::_bind_methods() {
+    ClassDB::bind_method(D_METHOD("set_mix_rate", "hz"), &SoundFontGenerator::set_mix_rate);
+    ClassDB::bind_method(D_METHOD("get_mix_rate"), &SoundFontGenerator::get_mix_rate);
+    ClassDB::bind_method(D_METHOD("set_soundfont", "soundfont"), &SoundFontGenerator::set_soundfont);
+    ClassDB::bind_method(D_METHOD("get_soundfont"), &SoundFontGenerator::get_soundfont);
+    ClassDB::bind_method(D_METHOD("set_stereo", "stereo"), &SoundFontGenerator::set_stereo);
+    ClassDB::bind_method(D_METHOD("get_stereo"), &SoundFontGenerator::get_stereo);
+    ClassDB::bind_method(D_METHOD("set_gain", "gain"), &SoundFontGenerator::set_gain);
+    ClassDB::bind_method(D_METHOD("get_gain"), &SoundFontGenerator::get_gain);
+    ClassDB::bind_method(D_METHOD("set_volume", "volume"), &SoundFontGenerator::set_volume);
+    ClassDB::bind_method(D_METHOD("get_volume"), &SoundFontGenerator::get_volume);
+    ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "soundfont", PROPERTY_HINT_RESOURCE_TYPE, "SoundFont"), "set_soundfont", "get_soundfont");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "mix_rate", PROPERTY_HINT_RANGE, "20,192000,1,suffix:Hz"), "set_mix_rate", "get_mix_rate");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "stereo"), "set_stereo", "get_stereo");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "gain", PROPERTY_HINT_RANGE, "-22.0,22.0,0.1,suffix:dB"), "set_gain", "get_gain");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "volume", PROPERTY_HINT_RANGE, "0.0,1.0,0.01,suffix:"), "set_volume", "get_volume");
+
+    ClassDB::bind_method(D_METHOD("get_presetindex", "bank", "preset_number"), &SoundFontGenerator::get_presetindex);
+    ClassDB::bind_method(D_METHOD("get_presetcount"), &SoundFontGenerator::get_presetcount);
+    ClassDB::bind_method(D_METHOD("get_presetname", "preset_number"), &SoundFontGenerator::get_presetname);
 }

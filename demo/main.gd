@@ -10,6 +10,8 @@ func _ready():
 	print(sf.get_data())
 	print(sf.get_first())
 	$SoundFontGenerator.set_soundfont(sf)
+	print($SoundFontGenerator.get_presetcount())
+	print($SoundFontGenerator.get_presetname(0))
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

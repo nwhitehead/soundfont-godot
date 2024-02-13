@@ -54,6 +54,7 @@ public:
     Ref<SoundFont> get_soundfont() const;
 
     void _process(double delta) override;
+
     void set_mix_rate(float mix_rate);
     float get_mix_rate() const;
     void set_stereo(bool stereo);
@@ -63,7 +64,9 @@ public:
     void set_volume(float volume);
     float get_volume() const;
 
-
+    int get_presetindex(int bank, int preset_number) const;
+    int get_presetcount() const;
+    String get_presetname(int preset_number) const;
 };
 
 }
