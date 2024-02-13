@@ -14,7 +14,7 @@ func _ready():
 	print(sfg.get_presetcount())
 	print(sfg.get_presetname(0))
 	sfg.note_on(0, 64, 1.0)
-	var out = sfg.render(10)
+	var out = sfg.render(100)
 	print(out)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

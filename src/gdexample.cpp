@@ -192,6 +192,8 @@ PackedVector2Array SoundFontGenerator::render(int samples) {
         UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontGenerator");
         return result;
     }
+    result.resize(samples);
+    tsf_render_float(generator, reinterpret_cast<float*>(result.ptrw()), samples);
     return result;
 }
 
