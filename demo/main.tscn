@@ -17,3 +17,4 @@ stream = SubResource("AudioStreamRandomizer_nfa57")
 
 [node name="SoundFontGenerator" type="SoundFontGenerator" parent="."]
 soundfont = SubResource("SoundFont_cssh6")
+gain = -12.3

@@ -36,6 +36,7 @@ private:
     double time_passed;
     float mix_rate;
     bool stereo;
+    float gain;
     Ref<SoundFont> soundfont;
     tsf * generator;
 
@@ -54,6 +55,8 @@ public:
     float get_mix_rate() const;
     void set_stereo(bool stereo);
     bool get_stereo() const;
+    void set_gain(float gain);
+    float get_gain() const;
 };
 
 }

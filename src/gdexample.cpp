@@ -37,16 +37,20 @@ void SoundFontGenerator::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_soundfont"), &SoundFontGenerator::get_soundfont);
     ClassDB::bind_method(D_METHOD("set_stereo", "stereo"), &SoundFontGenerator::set_stereo);
     ClassDB::bind_method(D_METHOD("get_stereo"), &SoundFontGenerator::get_stereo);
+    ClassDB::bind_method(D_METHOD("set_gain", "gain"), &SoundFontGenerator::set_gain);
+    ClassDB::bind_method(D_METHOD("get_gain"), &SoundFontGenerator::get_gain);
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "soundfont", PROPERTY_HINT_RESOURCE_TYPE, "SoundFont"), "set_soundfont", "get_soundfont");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "mix_rate", PROPERTY_HINT_RANGE, "20,192000,1,suffix:Hz"), "set_mix_rate", "get_mix_rate");
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "stereo"), "set_stereo", "get_stereo");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "gain", PROPERTY_HINT_RANGE, "-22.0,22.0,0.1,suffix:dB"), "set_gain", "get_gain");
 }
 
 SoundFontGenerator::SoundFontGenerator() {
     // Initialize any variables here.
-    time_passed = 0.0;
-    mix_rate = 44100.0;
+    time_passed = 0.0f;
+    mix_rate = 44100.0f;
     stereo = true;
+    gain = 0.0f;
     generator = nullptr;
 }
 
@@ -91,6 +95,14 @@ void SoundFontGenerator::set_stereo(bool p_stereo) {
 
 bool SoundFontGenerator::get_stereo() const {
     return stereo;
+}
+
+void SoundFontGenerator::set_gain(float p_gain) {
+    gain = p_gain;
+}
+
+float SoundFontGenerator::get_gain() const {
+    return gain;
 }
 
 void SoundFontGenerator::_process(double delta) {
