@@ -36,14 +36,14 @@ SoundFontGenerator::SoundFontGenerator() {
     mix_rate = 44100.0f;
     stereo = true;
     gain = 0.0f;
-    volume = 1.0f;
+    max_voices = 32;
     generator = nullptr;
 }
 
 void SoundFontGenerator::setup_generator() {
     if (generator) {
         tsf_set_output(generator, stereo ? TSF_STEREO_INTERLEAVED : TSF_MONO, static_cast<int>(mix_rate), gain);
-        tsf_set_volume(generator, volume);
+        tsf_set_max_voices(generator, max_voices);
     }
 }
 
@@ -102,13 +102,13 @@ float SoundFontGenerator::get_gain() const {
     return gain;
 }
 
-void SoundFontGenerator::set_volume(float p_volume) {
-    volume = p_volume;
+void SoundFontGenerator::set_max_voices(int p_max_voices) {
+    max_voices = p_max_voices;
     setup_generator();
 }
 
-float SoundFontGenerator::get_volume() const {
-    return volume;
+int SoundFontGenerator::get_max_voices() const {
+    return max_voices;
 }
 
 void SoundFontGenerator::_process(double delta) {
@@ -129,12 +129,20 @@ int SoundFontGenerator::get_presetcount() const {
     return tsf_get_presetcount(generator);
 }
 
-String SoundFontGenerator::get_presetname(int preset_number) const {
+String SoundFontGenerator::get_presetname(int preset_index) const {
     if (!generator) {
         UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontGenerator");
         return String("");
     }
-    return String(tsf_get_presetname(generator, preset_number));
+    return String(tsf_get_presetname(generator, preset_index));
+}
+
+String SoundFontGenerator::bank_get_presetname(int bank, int preset_number) const {
+    if (!generator) {
+        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontGenerator");
+        return String("");
+    }
+    return String(tsf_bank_get_presetname(generator, bank, preset_number));
 }
 
 void SoundFontGenerator::_bind_methods() {
@@ -146,15 +154,16 @@ void SoundFontGenerator::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_stereo"), &SoundFontGenerator::get_stereo);
     ClassDB::bind_method(D_METHOD("set_gain", "gain"), &SoundFontGenerator::set_gain);
     ClassDB::bind_method(D_METHOD("get_gain"), &SoundFontGenerator::get_gain);
-    ClassDB::bind_method(D_METHOD("set_volume", "volume"), &SoundFontGenerator::set_volume);
-    ClassDB::bind_method(D_METHOD("get_volume"), &SoundFontGenerator::get_volume);
+    ClassDB::bind_method(D_METHOD("set_max_voices", "max_voices"), &SoundFontGenerator::set_max_voices);
+    ClassDB::bind_method(D_METHOD("get_max_voices"), &SoundFontGenerator::get_max_voices);
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "soundfont", PROPERTY_HINT_RESOURCE_TYPE, "SoundFont"), "set_soundfont", "get_soundfont");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "mix_rate", PROPERTY_HINT_RANGE, "20,192000,1,suffix:Hz"), "set_mix_rate", "get_mix_rate");
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "stereo"), "set_stereo", "get_stereo");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "gain", PROPERTY_HINT_RANGE, "-22.0,22.0,0.1,suffix:dB"), "set_gain", "get_gain");
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "volume", PROPERTY_HINT_RANGE, "0.0,1.0,0.01,suffix:"), "set_volume", "get_volume");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_voices", PROPERTY_HINT_RANGE, "1,256,1"), "set_max_voices", "get_max_voices");
 
     ClassDB::bind_method(D_METHOD("get_presetindex", "bank", "preset_number"), &SoundFontGenerator::get_presetindex);
     ClassDB::bind_method(D_METHOD("get_presetcount"), &SoundFontGenerator::get_presetcount);
-    ClassDB::bind_method(D_METHOD("get_presetname", "preset_number"), &SoundFontGenerator::get_presetname);
+    ClassDB::bind_method(D_METHOD("get_presetname", "preset_index"), &SoundFontGenerator::get_presetname);
+    ClassDB::bind_method(D_METHOD("bank_get_presetname", "bank", "preset_number"), &SoundFontGenerator::bank_get_presetname);
 }

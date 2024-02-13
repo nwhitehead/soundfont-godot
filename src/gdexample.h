@@ -37,7 +37,7 @@ private:
     float mix_rate;
     bool stereo;
     float gain;
-    float volume;
+    int max_voices;
     Ref<SoundFont> soundfont;
     tsf * generator;
 
@@ -61,12 +61,13 @@ public:
     bool get_stereo() const;
     void set_gain(float gain);
     float get_gain() const;
-    void set_volume(float volume);
-    float get_volume() const;
+    void set_max_voices(int max_voices);
+    int get_max_voices() const;
 
     int get_presetindex(int bank, int preset_number) const;
     int get_presetcount() const;
-    String get_presetname(int preset_number) const;
+    String get_presetname(int preset_index) const;
+    String bank_get_presetname(int bank, int preset_number) const;
 };
 
 }
