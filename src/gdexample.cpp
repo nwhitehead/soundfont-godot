@@ -6,10 +6,10 @@ using namespace godot;
 void SoundFont::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_mix_rate", "hz"), &SoundFont::set_mix_rate);
 	ClassDB::bind_method(D_METHOD("get_mix_rate"), &SoundFont::get_mix_rate);
-    ClassDB::bind_method(D_METHOD("set_stream", "stream"), &SoundFont::set_stream);
-    ClassDB::bind_method(D_METHOD("get_stream"), &SoundFont::get_stream);
+    ClassDB::bind_method(D_METHOD("set_resource", "resource"), &SoundFont::set_resource);
+    ClassDB::bind_method(D_METHOD("get_resource"), &SoundFont::get_resource);
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "mix_rate", PROPERTY_HINT_RANGE, "20,192000,1,suffix:Hz"), "set_mix_rate", "get_mix_rate");
-	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "stream", PROPERTY_HINT_RESOURCE_TYPE, "AudioStream"), "set_stream", "get_stream");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "resource", PROPERTY_HINT_RESOURCE_TYPE, "Resource"), "set_resource", "get_resource");
 }
 
 SoundFont::SoundFont() {
@@ -30,12 +30,12 @@ float SoundFont::get_mix_rate() const {
     return mix_rate;    
 }
 
-void SoundFont::set_stream(Ref<AudioStream> p_stream) {
-    stream = p_stream;
+void SoundFont::set_resource(Ref<Resource> p_resource) {
+    resource = p_resource;
 }
 
-Ref<AudioStream> SoundFont::get_stream() const {
-    return stream;
+Ref<Resource> SoundFont::get_resource() const {
+    return resource;
 }
 
 void SoundFont::_process(double delta) {

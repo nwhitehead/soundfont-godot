@@ -1,7 +1,10 @@
-[gd_scene format=3 uid="uid://dfhsqj7og2fgr"]
+[gd_scene load_steps=2 format=3 uid="uid://dfhsqj7og2fgr"]
+
+[sub_resource type="Resource" id="Resource_jvkfb"]
 
 [node name="Main" type="Node2D"]
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 
 [node name="SoundFont" type="SoundFont" parent="."]
+resource = SubResource("Resource_jvkfb")

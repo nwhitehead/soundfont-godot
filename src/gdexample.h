@@ -1,7 +1,7 @@
 #ifndef SOUNDFONT_H
 #define SOUNDFONT_H
 
-#include <godot_cpp/classes/audio_stream.hpp>
+#include <godot_cpp/classes/resource.hpp>
 #include <godot_cpp/classes/node.hpp>
 
 namespace godot {
@@ -13,7 +13,7 @@ private:
 	double time_passed;
     float mix_rate;
     String filename;
-    Ref<AudioStream> stream;
+    Ref<Resource> resource;
 
 protected:
 	static void _bind_methods();
@@ -22,8 +22,8 @@ public:
 	SoundFont();
 	~SoundFont();
 
-    void set_stream(Ref<AudioStream> p_stream);
-    Ref<AudioStream> get_stream() const;
+    void set_resource(Ref<Resource> p_resource);
+    Ref<Resource> get_resource() const;
 
 	void _process(double delta) override;
     void set_mix_rate(float mix_rate);
