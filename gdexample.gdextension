@@ -1,6 +1,6 @@
 [icons]
 
-SoundFontPlayer = "res://icon.svg"
+SoundFontGenerator = "res://icon.svg"
 SoundFont = "res://icon.svg"
 
 [configuration]

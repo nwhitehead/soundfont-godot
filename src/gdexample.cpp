@@ -27,59 +27,59 @@ PackedByteArray SoundFont::get_data() const {
     return result;
 }
 
-void SoundFontPlayer::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("set_mix_rate", "hz"), &SoundFontPlayer::set_mix_rate);
-    ClassDB::bind_method(D_METHOD("get_mix_rate"), &SoundFontPlayer::get_mix_rate);
-    ClassDB::bind_method(D_METHOD("set_soundfont", "soundfont"), &SoundFontPlayer::set_soundfont);
-    ClassDB::bind_method(D_METHOD("get_soundfont"), &SoundFontPlayer::get_soundfont);
-    ClassDB::bind_method(D_METHOD("set_stereo", "stereo"), &SoundFontPlayer::set_stereo);
-    ClassDB::bind_method(D_METHOD("get_stereo"), &SoundFontPlayer::get_stereo);
+void SoundFontGenerator::_bind_methods() {
+    ClassDB::bind_method(D_METHOD("set_mix_rate", "hz"), &SoundFontGenerator::set_mix_rate);
+    ClassDB::bind_method(D_METHOD("get_mix_rate"), &SoundFontGenerator::get_mix_rate);
+    ClassDB::bind_method(D_METHOD("set_soundfont", "soundfont"), &SoundFontGenerator::set_soundfont);
+    ClassDB::bind_method(D_METHOD("get_soundfont"), &SoundFontGenerator::get_soundfont);
+    ClassDB::bind_method(D_METHOD("set_stereo", "stereo"), &SoundFontGenerator::set_stereo);
+    ClassDB::bind_method(D_METHOD("get_stereo"), &SoundFontGenerator::get_stereo);
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "soundfont", PROPERTY_HINT_RESOURCE_TYPE, "SoundFont"), "set_soundfont", "get_soundfont");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "mix_rate", PROPERTY_HINT_RANGE, "20,192000,1,suffix:Hz"), "set_mix_rate", "get_mix_rate");
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "stereo"), "set_stereo", "get_stereo");
 }
 
-SoundFontPlayer::SoundFontPlayer() {
+SoundFontGenerator::SoundFontGenerator() {
     // Initialize any variables here.
     time_passed = 0.0;
     mix_rate = 44100.0;
     stereo = true;
 }
 
-SoundFontPlayer::~SoundFontPlayer() {
+SoundFontGenerator::~SoundFontGenerator() {
     // Add your cleanup here.
 }
 
-void SoundFontPlayer::set_mix_rate(float p_mix_rate) {
+void SoundFontGenerator::set_mix_rate(float p_mix_rate) {
     mix_rate = p_mix_rate;
 }
 
-float SoundFontPlayer::get_mix_rate() const {
+float SoundFontGenerator::get_mix_rate() const {
     return mix_rate;    
 }
 
-void SoundFontPlayer::set_soundfont(Ref<SoundFont> p_soundfont) {
+void SoundFontGenerator::set_soundfont(Ref<SoundFont> p_soundfont) {
     soundfont = p_soundfont;
     if (soundfont.is_valid()) {
-        UtilityFunctions::print("SoundFontPlayer set_soundfont called, size=", soundfont->get_data().size());
+        UtilityFunctions::print("SoundFontGenerator set_soundfont called, size=", soundfont->get_data().size());
     } else {
-        UtilityFunctions::print("SoundFontPlayer set_soundfont called (empty soundfont)");
+        UtilityFunctions::print("SoundFontGenerator set_soundfont called (empty soundfont)");
     }
 }
 
-Ref<SoundFont> SoundFontPlayer::get_soundfont() const {
+Ref<SoundFont> SoundFontGenerator::get_soundfont() const {
     return soundfont;
 }
 
-void SoundFontPlayer::set_stereo(bool p_stereo) {
+void SoundFontGenerator::set_stereo(bool p_stereo) {
     stereo = p_stereo;
 }
 
-bool SoundFontPlayer::get_stereo() const {
+bool SoundFontGenerator::get_stereo() const {
     return stereo;
 }
 
-void SoundFontPlayer::_process(double delta) {
+void SoundFontGenerator::_process(double delta) {
     time_passed += delta;
     
 }

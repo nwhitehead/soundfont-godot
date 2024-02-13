@@ -27,8 +27,8 @@ public:
 };
 
 /// The node that can play notes and generate audio from a SoundFont
-class SoundFontPlayer : public Node {
-    GDCLASS(SoundFontPlayer, Node)
+class SoundFontGenerator : public Node {
+    GDCLASS(SoundFontGenerator, Node)
 
 private:
     double time_passed;
@@ -40,8 +40,8 @@ protected:
     static void _bind_methods();
 
 public:
-    SoundFontPlayer();
-    ~SoundFontPlayer();
+    SoundFontGenerator();
+    ~SoundFontGenerator();
 
     void set_soundfont(Ref<SoundFont> p_resource);
     Ref<SoundFont> get_soundfont() const;
