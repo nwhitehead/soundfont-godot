@@ -193,7 +193,17 @@ PackedVector2Array SoundFontGenerator::render(int samples) {
         return result;
     }
     result.resize(samples);
-    tsf_render_float(generator, reinterpret_cast<float*>(result.ptrw()), samples);
+    if (stereo) {
+        tsf_render_float(generator, reinterpret_cast<float*>(result.ptrw()), samples);
+        return result;
+    }
+    // For mono, need to duplicate values for return value
+    Vector<float> temp;
+    temp.resize(samples);
+    tsf_render_float(generator, temp.ptrw(), samples);
+    for (int i = 0; i < samples; i++) {
+        result[i] = Vector2(temp[i], temp[i]);
+    }
     return result;
 }
 
