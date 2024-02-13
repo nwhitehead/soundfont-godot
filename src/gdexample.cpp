@@ -6,6 +6,9 @@ using namespace godot;
 void SoundFont::_bind_methods() {
 }
 
+void SoundFontImporter::_bind_methods() {
+}
+
 void SoundFontPlayer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_mix_rate", "hz"), &SoundFontPlayer::set_mix_rate);
     ClassDB::bind_method(D_METHOD("get_mix_rate"), &SoundFontPlayer::get_mix_rate);

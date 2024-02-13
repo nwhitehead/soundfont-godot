@@ -8,7 +8,10 @@
 namespace godot {
 
 class SoundFontImporter : public ResourceImporter {
+    GDCLASS(SoundFontImporter, ResourceImporter)
 
+protected:
+    static void _bind_methods();
 };
 
 class SoundFont : public Resource {
