@@ -145,6 +145,28 @@ String SoundFontGenerator::bank_get_presetname(int bank, int preset_number) cons
     return String(tsf_bank_get_presetname(generator, bank, preset_number));
 }
 
+void SoundFontGenerator::note_on(int preset_index, int key, float velocity) {
+    if (!generator) {
+        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontGenerator");
+        return;
+    }
+    if (!tsf_note_on(generator, preset_index, key, velocity)) {
+        UtilityFunctions::printerr("Could not allocate voice for note");
+        return;
+    }
+}
+
+void SoundFontGenerator::bank_note_on(int bank, int preset_number, int key, float velocity) {
+    if (!generator) {
+        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontGenerator");
+        return;
+    }
+    if (!tsf_bank_note_on(generator, bank, preset_number, key, velocity)) {
+        UtilityFunctions::printerr("Could not allocate voice for note");
+        return;
+    }
+}
+
 void SoundFontGenerator::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_mix_rate", "hz"), &SoundFontGenerator::set_mix_rate);
     ClassDB::bind_method(D_METHOD("get_mix_rate"), &SoundFontGenerator::get_mix_rate);
@@ -166,4 +188,6 @@ void SoundFontGenerator::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_presetcount"), &SoundFontGenerator::get_presetcount);
     ClassDB::bind_method(D_METHOD("get_presetname", "preset_index"), &SoundFontGenerator::get_presetname);
     ClassDB::bind_method(D_METHOD("bank_get_presetname", "bank", "preset_number"), &SoundFontGenerator::bank_get_presetname);
+    ClassDB::bind_method(D_METHOD("note_on", "preset_index", "key", "velocity"), &SoundFontGenerator::note_on);
+    ClassDB::bind_method(D_METHOD("bank_note_on", "bank", "preset_number", "key", "velocity"), &SoundFontGenerator::bank_note_on);
 }

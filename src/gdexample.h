@@ -68,6 +68,8 @@ public:
     int get_presetcount() const;
     String get_presetname(int preset_index) const;
     String bank_get_presetname(int bank, int preset_number) const;
+    void note_on(int preset_index, int key, float velocity);
+    void bank_note_on(int bank, int preset_number, int key, float velocity);
 };
 
 }

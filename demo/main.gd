@@ -9,10 +9,11 @@ func _ready():
 	sf.set_data(data)
 	print(sf.get_data())
 	print(sf.get_first())
-	$SoundFontGenerator.set_soundfont(sf)
-	print($SoundFontGenerator.get_presetcount())
-	print($SoundFontGenerator.get_presetname(0))
-
+	var sfg = $SoundFontGenerator
+	sfg.set_soundfont(sf)
+	print(sfg.get_presetcount())
+	print(sfg.get_presetname(0))
+	sfg.note_on(0, 64, 1.0)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
