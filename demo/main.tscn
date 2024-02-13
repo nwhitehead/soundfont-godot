@@ -1,7 +1,10 @@
-[gd_scene format=3 uid="uid://dfhsqj7og2fgr"]
+[gd_scene load_steps=2 format=3 uid="uid://dfhsqj7og2fgr"]
+
+[sub_resource type="SoundFont" id="SoundFont_8h4qp"]
 
 [node name="Main" type="Node2D"]
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 
 [node name="SoundFontPlayer" type="SoundFontPlayer" parent="."]
+soundfont = SubResource("SoundFont_8h4qp")
