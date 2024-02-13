@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://dfhsqj7og2fgr"]
+[gd_scene load_steps=3 format=3 uid="uid://dfhsqj7og2fgr"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_526j8"]
 
@@ -7,8 +7,6 @@ streams_count = 2
 stream_0/weight = 1.0
 stream_1/weight = 1.0
 
-[sub_resource type="SoundFont" id="SoundFont_q1ag0"]
-
 [node name="Main" type="Node2D"]
 script = ExtResource("1_526j8")
 
@@ -16,4 +14,3 @@ script = ExtResource("1_526j8")
 stream = SubResource("AudioStreamRandomizer_nfa57")
 
 [node name="SoundFontPlayer" type="SoundFontPlayer" parent="."]
-soundfont = SubResource("SoundFont_q1ag0")

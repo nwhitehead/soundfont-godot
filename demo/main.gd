@@ -8,6 +8,7 @@ func _ready():
 	sf.set_data(data)
 	print(sf.get_data())
 	print(sf.get_first())
+	$SoundFontPlayer.set_soundfont(sf)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
