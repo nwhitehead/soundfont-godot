@@ -37,8 +37,11 @@ private:
     float mix_rate;
     bool stereo;
     float gain;
+    float volume;
     Ref<SoundFont> soundfont;
     tsf * generator;
+
+    void setup_generator();
 
 protected:
     static void _bind_methods();
@@ -57,6 +60,10 @@ public:
     bool get_stereo() const;
     void set_gain(float gain);
     float get_gain() const;
+    void set_volume(float volume);
+    float get_volume() const;
+
+
 };
 
 }
