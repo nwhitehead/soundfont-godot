@@ -6,8 +6,8 @@
 
 namespace godot {
 
-class SoundFont : public Node {
-	GDCLASS(SoundFont, Node)
+class SoundFontPlayer : public Node {
+	GDCLASS(SoundFontPlayer, Node)
 
 private:
 	double time_passed;
@@ -19,8 +19,8 @@ protected:
 	static void _bind_methods();
 
 public:
-	SoundFont();
-	~SoundFont();
+	SoundFontPlayer();
+	~SoundFontPlayer();
 
     void set_resource(Ref<Resource> p_resource);
     Ref<Resource> get_resource() const;
