@@ -37,6 +37,7 @@ private:
     float mix_rate;
     bool stereo;
     Ref<SoundFont> soundfont;
+    tsf * generator;
 
 protected:
     static void _bind_methods();

@@ -47,10 +47,13 @@ SoundFontGenerator::SoundFontGenerator() {
     time_passed = 0.0;
     mix_rate = 44100.0;
     stereo = true;
+    generator = nullptr;
 }
 
 SoundFontGenerator::~SoundFontGenerator() {
-    // Add your cleanup here.
+    if (generator) {
+        tsf_close(generator);
+    }
 }
 
 void SoundFontGenerator::set_mix_rate(float p_mix_rate) {
@@ -62,9 +65,17 @@ float SoundFontGenerator::get_mix_rate() const {
 }
 
 void SoundFontGenerator::set_soundfont(Ref<SoundFont> p_soundfont) {
+    if (generator) {
+        tsf_close(generator);
+        generator = nullptr;
+    }
     soundfont = p_soundfont;
-    if (soundfont.is_valid()) {
+    if (soundfont.is_valid() && soundfont->get_data().size()) {
         UtilityFunctions::print("SoundFontGenerator set_soundfont called, size=", soundfont->get_data().size());
+        generator = tsf_load_memory(soundfont->get_data().ptr(), soundfont->get_data().size());
+        if (!generator) {
+            UtilityFunctions::printerr("Error parsing SF2 resource inside SoundFontGenerator");
+        }
     } else {
         UtilityFunctions::print("SoundFontGenerator set_soundfont called (empty soundfont)");
     }
