@@ -35,7 +35,7 @@ SoundFontGenerator::SoundFontGenerator() {
     time_passed = 0.0f;
     mix_rate = 44100.0f;
     stereo = true;
-    gain = 0.0f;
+    gain = -12.0f;
     max_voices = 32;
     generator = nullptr;
 }
@@ -221,7 +221,7 @@ void SoundFontGenerator::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "soundfont", PROPERTY_HINT_RESOURCE_TYPE, "SoundFont"), "set_soundfont", "get_soundfont");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "mix_rate", PROPERTY_HINT_RANGE, "20,192000,1,suffix:Hz"), "set_mix_rate", "get_mix_rate");
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "stereo"), "set_stereo", "get_stereo");
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "gain", PROPERTY_HINT_RANGE, "-22.0,22.0,0.1,suffix:dB"), "set_gain", "get_gain");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "gain", PROPERTY_HINT_RANGE, "-48.0,12.0,0.1,suffix:dB"), "set_gain", "get_gain");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_voices", PROPERTY_HINT_RANGE, "1,256,1"), "set_max_voices", "get_max_voices");
 
     ClassDB::bind_method(D_METHOD("get_presetindex", "bank", "preset_number"), &SoundFontGenerator::get_presetindex);
