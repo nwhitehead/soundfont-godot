@@ -7,6 +7,8 @@
 #include <godot_cpp/templates/vector.hpp>
 #include <godot_cpp/variant/packed_byte_array.hpp>
 
+#include "tsf/tsf.h"
+
 namespace godot {
 
 /// A resource the represents the .sf2 file contents
