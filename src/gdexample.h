@@ -1,28 +1,28 @@
 #ifndef SOUNDFONT_H
 #define SOUNDFONT_H
 
-#include <godot_cpp/classes/resource_importer.hpp>
+#include <godot_cpp/classes/ref.hpp>
 #include <godot_cpp/classes/resource.hpp>
 #include <godot_cpp/classes/node.hpp>
+#include <godot_cpp/templates/vector.hpp>
+//#include <godot_cpp/variant/typed_array.hpp>
+//#include <godot_cpp/variant/packed_byte_array.hpp>
 
 namespace godot {
 
-class SoundFontImporter : public ResourceImporter {
-    GDCLASS(SoundFontImporter, ResourceImporter)
+class SoundFont : public Resource {
+    GDCLASS(SoundFont, Resource)
+
+private:
+    Vector<uint8_t> data;
 
 protected:
     static void _bind_methods();
 
 public:
-    String get_importer_name() const;
+    void set_data(const Vector<uint8_t> &p_data);
+    Vector<uint8_t> get_data() const;
 
-};
-
-class SoundFont : public Resource {
-    GDCLASS(SoundFont, Resource)
-
-protected:
-    static void _bind_methods();
 };
 
 class SoundFontPlayer : public Node {
@@ -31,7 +31,6 @@ class SoundFontPlayer : public Node {
 private:
     double time_passed;
     float mix_rate;
-    String filename;
     Ref<SoundFont> soundfont;
 
 protected:
@@ -47,8 +46,6 @@ public:
     void _process(double delta) override;
     void set_mix_rate(float mix_rate);
     float get_mix_rate() const;
-    void set_filename(String p_filename);
-    String get_filename() const;
 };
 
 }

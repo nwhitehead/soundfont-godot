@@ -15,7 +15,6 @@ void initialize_example_module(ModuleInitializationLevel p_level) {
 
     ClassDB::register_class<SoundFontPlayer>();
     ClassDB::register_class<SoundFont>();
-    ClassDB::register_class<SoundFontImporter>();
 }
 
 extern "C" {
