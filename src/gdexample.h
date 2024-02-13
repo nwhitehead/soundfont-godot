@@ -4,6 +4,7 @@
 #include <godot_cpp/classes/ref.hpp>
 #include <godot_cpp/classes/resource.hpp>
 #include <godot_cpp/classes/node.hpp>
+#include <godot_cpp/templates/vector.hpp>
 #include <godot_cpp/variant/packed_byte_array.hpp>
 
 namespace godot {
@@ -12,7 +13,7 @@ class SoundFont : public Resource {
     GDCLASS(SoundFont, Resource)
 
 private:
-    PackedByteArray data;
+    Vector<uint8_t> sfdata;
 
 protected:
     static void _bind_methods();
@@ -20,7 +21,7 @@ protected:
 public:
     void set_data(const PackedByteArray &p_data);
     PackedByteArray get_data() const;
-
+    int get_first() const;
 };
 
 class SoundFontPlayer : public Node {

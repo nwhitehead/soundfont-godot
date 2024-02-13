@@ -7,14 +7,23 @@ using namespace godot;
 void SoundFont::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_data", "data"), &SoundFont::set_data);
     ClassDB::bind_method(D_METHOD("get_data"), &SoundFont::get_data);
+    ClassDB::bind_method(D_METHOD("get_first"), &SoundFont::get_first);
+}
+
+int SoundFont::get_first() const {
+    return sfdata[0];
 }
 
 void SoundFont::set_data(const PackedByteArray &p_data) {
-    data = p_data;
+    sfdata.resize(p_data.size());
+    memcpy(sfdata.ptrw(), p_data.ptr(), p_data.size());
 }
 
 PackedByteArray SoundFont::get_data() const {
-    return data;
+    PackedByteArray result;
+    result.resize(sfdata.size());
+    memcpy(result.ptrw(), sfdata.ptr(), sfdata.size());
+    return result;
 }
 
 void SoundFontPlayer::_bind_methods() {

@@ -7,6 +7,7 @@ func _ready():
 	var data = file.get_buffer(file.get_length())
 	sf.set_data(data)
 	print(sf.get_data())
+	print(sf.get_first())
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
