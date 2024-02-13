@@ -5,15 +5,15 @@
 using namespace godot;
 
 void SoundFont::_bind_methods() {
-//    ClassDB::bind_method(D_METHOD("set_data", "data"), &SoundFont::set_data);
+    ClassDB::bind_method(D_METHOD("set_data", "data"), &SoundFont::set_data);
     ClassDB::bind_method(D_METHOD("get_data"), &SoundFont::get_data);
 }
 
-void SoundFont::set_data(const Vector<uint8_t> &p_data) {
+void SoundFont::set_data(const PackedByteArray &p_data) {
     data = p_data;
 }
 
-Vector<uint8_t> SoundFont::get_data() const {
+PackedByteArray SoundFont::get_data() const {
     return data;
 }
 
