@@ -2,19 +2,19 @@
 
 [ext_resource type="Script" path="res://main.gd" id="1_526j8"]
 
-[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_nfa57"]
-streams_count = 2
-stream_0/weight = 1.0
-stream_1/weight = 1.0
-
 [sub_resource type="SoundFont" id="SoundFont_cssh6"]
+
+[sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_3b46x"]
+buffer_length = 0.1
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_526j8")
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
-stream = SubResource("AudioStreamRandomizer_nfa57")
-
 [node name="SoundFontGenerator" type="SoundFontGenerator" parent="."]
 soundfont = SubResource("SoundFont_cssh6")
-gain = -12.9
+stereo = false
+gain = -3.3
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="SoundFontGenerator"]
+stream = SubResource("AudioStreamGenerator_3b46x")
+autoplay = true
