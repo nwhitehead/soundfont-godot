@@ -6,6 +6,7 @@
 #include <godot_cpp/classes/node.hpp>
 #include <godot_cpp/templates/vector.hpp>
 #include <godot_cpp/variant/packed_byte_array.hpp>
+#include <godot_cpp/variant/packed_vector2_array.hpp>
 
 #include "tsf/tsf.h"
 
@@ -72,6 +73,8 @@ public:
     void bank_note_on(int bank, int preset_number, int key, float velocity);
     void note_off(int preset_index, int key);
     void bank_note_off(int bank, int preset_number, int key);
+
+    PackedVector2Array render(int samples);
 };
 
 }

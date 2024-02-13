@@ -186,6 +186,15 @@ void SoundFontGenerator::bank_note_off(int bank, int preset_number, int key) {
     }
 }
 
+PackedVector2Array SoundFontGenerator::render(int samples) {
+    PackedVector2Array result{};
+    if (!generator) {
+        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontGenerator");
+        return result;
+    }
+    return result;
+}
+
 void SoundFontGenerator::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_mix_rate", "hz"), &SoundFontGenerator::set_mix_rate);
     ClassDB::bind_method(D_METHOD("get_mix_rate"), &SoundFontGenerator::get_mix_rate);
@@ -211,4 +220,5 @@ void SoundFontGenerator::_bind_methods() {
     ClassDB::bind_method(D_METHOD("bank_note_on", "bank", "preset_number", "key", "velocity"), &SoundFontGenerator::bank_note_on);
     ClassDB::bind_method(D_METHOD("note_off", "preset_index", "key"), &SoundFontGenerator::note_off);
     ClassDB::bind_method(D_METHOD("bank_note_off", "bank", "preset_number", "key"), &SoundFontGenerator::bank_note_off);
+    ClassDB::bind_method(D_METHOD("render", "samples"), &SoundFontGenerator::render);
 }
