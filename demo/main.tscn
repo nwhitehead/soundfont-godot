@@ -13,7 +13,7 @@ script = ExtResource("1_526j8")
 [node name="SoundFontGenerator" type="SoundFontGenerator" parent="."]
 soundfont = SubResource("SoundFont_cssh6")
 stereo = false
-gain = -22.0
+gain = -7.8
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="SoundFontGenerator"]
 stream = SubResource("AudioStreamGenerator_3b46x")
