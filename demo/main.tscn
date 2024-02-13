@@ -1,10 +1,20 @@
-[gd_scene load_steps=2 format=3 uid="uid://dfhsqj7og2fgr"]
+[gd_scene load_steps=4 format=3 uid="uid://dfhsqj7og2fgr"]
 
-[sub_resource type="SoundFont" id="SoundFont_8h4qp"]
+[ext_resource type="Script" path="res://main.gd" id="1_526j8"]
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_nfa57"]
+streams_count = 2
+stream_0/weight = 1.0
+stream_1/weight = 1.0
+
+[sub_resource type="SoundFont" id="SoundFont_qg2ng"]
 
 [node name="Main" type="Node2D"]
+script = ExtResource("1_526j8")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = SubResource("AudioStreamRandomizer_nfa57")
 
 [node name="SoundFontPlayer" type="SoundFontPlayer" parent="."]
-soundfont = SubResource("SoundFont_8h4qp")
+soundfont = SubResource("SoundFont_qg2ng")
+filename = "Hello"

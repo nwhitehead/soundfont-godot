@@ -12,6 +12,10 @@ class SoundFontImporter : public ResourceImporter {
 
 protected:
     static void _bind_methods();
+
+public:
+    String get_importer_name() const;
+
 };
 
 class SoundFont : public Resource {
@@ -43,6 +47,8 @@ public:
     void _process(double delta) override;
     void set_mix_rate(float mix_rate);
     float get_mix_rate() const;
+    void set_filename(String p_filename);
+    String get_filename() const;
 };
 
 }
