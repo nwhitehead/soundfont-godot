@@ -16,13 +16,13 @@ int SoundFont::get_first() const {
 
 void SoundFont::set_data(const PackedByteArray &p_data) {
     sfdata.resize(p_data.size());
-    memcpy(sfdata.ptrw(), p_data.ptr(), p_data.size());
+    std::memcpy(sfdata.ptrw(), p_data.ptr(), p_data.size());
 }
 
 PackedByteArray SoundFont::get_data() const {
     PackedByteArray result;
     result.resize(sfdata.size());
-    memcpy(result.ptrw(), sfdata.ptr(), sfdata.size());
+    std::memcpy(result.ptrw(), sfdata.ptr(), sfdata.size());
     return result;
 }
 
@@ -31,14 +31,18 @@ void SoundFontPlayer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_mix_rate"), &SoundFontPlayer::get_mix_rate);
     ClassDB::bind_method(D_METHOD("set_soundfont", "soundfont"), &SoundFontPlayer::set_soundfont);
     ClassDB::bind_method(D_METHOD("get_soundfont"), &SoundFontPlayer::get_soundfont);
+    ClassDB::bind_method(D_METHOD("set_stereo", "stereo"), &SoundFontPlayer::set_stereo);
+    ClassDB::bind_method(D_METHOD("get_stereo"), &SoundFontPlayer::get_stereo);
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "mix_rate", PROPERTY_HINT_RANGE, "20,192000,1,suffix:Hz"), "set_mix_rate", "get_mix_rate");
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "soundfont", PROPERTY_HINT_RESOURCE_TYPE, "SoundFont"), "set_soundfont", "get_soundfont");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "stereo"), "set_stereo", "get_stereo");
 }
 
 SoundFontPlayer::SoundFontPlayer() {
     // Initialize any variables here.
     time_passed = 0.0;
     mix_rate = 44100.0;
+    stereo = true;
 }
 
 SoundFontPlayer::~SoundFontPlayer() {
@@ -59,6 +63,14 @@ void SoundFontPlayer::set_soundfont(Ref<SoundFont> p_soundfont) {
 
 Ref<SoundFont> SoundFontPlayer::get_soundfont() const {
     return soundfont;
+}
+
+void SoundFontPlayer::set_stereo(bool p_stereo) {
+    stereo = p_stereo;
+}
+
+bool SoundFontPlayer::get_stereo() const {
+    return stereo;
 }
 
 void SoundFontPlayer::_process(double delta) {

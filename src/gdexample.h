@@ -9,6 +9,8 @@
 
 namespace godot {
 
+/// A resource the represents the .sf2 file contents
+// Uses PackedByteArray in interface with gdscript because I couldn't get Vector<> working for that.
 class SoundFont : public Resource {
     GDCLASS(SoundFont, Resource)
 
@@ -24,12 +26,14 @@ public:
     int get_first() const;
 };
 
+/// The node that can play notes and generate audio from a SoundFont
 class SoundFontPlayer : public Node {
     GDCLASS(SoundFontPlayer, Node)
 
 private:
     double time_passed;
     float mix_rate;
+    bool stereo;
     Ref<SoundFont> soundfont;
 
 protected:
@@ -45,6 +49,8 @@ public:
     void _process(double delta) override;
     void set_mix_rate(float mix_rate);
     float get_mix_rate() const;
+    void set_stereo(bool stereo);
+    bool get_stereo() const;
 };
 
 }
