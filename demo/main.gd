@@ -1,6 +1,5 @@
 extends Node2D
 
-var sf: SoundFont = null
 var sfg: SoundFontGenerator = null
 var playback: AudioStreamPlayback = null # Actual playback stream, assigned in _ready().
 var time: float = 0.0
@@ -10,14 +9,8 @@ var preset: int = 1
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	sf = SoundFont.new()
-	# var file = FileAccess.open('res://example_broken.sf2', FileAccess.READ)
-	var file = FileAccess.open('res://FluidR3_GM.sf2', FileAccess.READ)
-	var data = file.get_buffer(file.get_length())
-	sf.set_data(data)
 	sfg = $SoundFontGenerator
 	playback = sfg.get_node("AudioStreamPlayer").get_stream_playback();
-	sfg.set_soundfont(sf)
 	print(sfg.get_presetname(preset))
 	# sfg.note_on(0, 44 - 24, 1.0)
 	var out = sfg.render(10)
@@ -53,4 +46,4 @@ func _input(event):
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	time += delta
-	_fill_buffer(delta)
+	#_fill_buffer(delta)
