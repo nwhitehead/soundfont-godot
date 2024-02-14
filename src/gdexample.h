@@ -2,6 +2,7 @@
 #define SOUNDFONT_H
 
 #include <godot_cpp/classes/audio_stream_generator.hpp>
+#include <godot_cpp/classes/audio_stream_player.hpp>
 #include <godot_cpp/classes/ref.hpp>
 #include <godot_cpp/classes/resource.hpp>
 #include <godot_cpp/classes/node.hpp>
@@ -22,6 +23,9 @@ class SoundFont : public Resource {
 
 private:
     Vector<uint8_t> sfdata;
+    tsf * generator;
+    float gain;
+    int max_voices;
 
 protected:
     static void _bind_methods();
@@ -29,6 +33,13 @@ protected:
 public:
     void set_data(const PackedByteArray &p_data);
     PackedByteArray get_data() const;
+
+    void set_gain(float gain);
+    float get_gain() const;
+    void set_max_voices(int max_voices);
+    int get_max_voices() const;
+
+    tsf * get_generator();
 };
 
 /// The node that can play notes and generate audio from a SoundFont
@@ -114,6 +125,25 @@ public:
     String bank_get_presetname(int bank, int preset_number) const;
 
 };
+
+class SFPlayer : public AudioStreamPlayer {
+
+    GDCLASS(SFPlayer, AudioStreamPlayer)
+
+private:
+    Ref<AudioStreamGenerator> genstream;
+
+protected:
+    static void _bind_methods();
+
+public:
+    SFPlayer();
+    ~SFPlayer();
+
+    void _process(double delta) override;
+};
+
+
 
 }
 

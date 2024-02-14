@@ -1,5 +1,6 @@
 #include "gdexample.h"
 #include <godot_cpp/core/class_db.hpp>
+#include <godot_cpp/classes/engine.hpp>
 #include <godot_cpp/classes/file_access.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 
@@ -344,4 +345,24 @@ void SoundFontPlayer::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("_process", "delta"), &SoundFontPlayer::_process);
 
+}
+
+SFPlayer::SFPlayer() {
+    genstream.instantiate();
+    set_stream(genstream);
+}
+
+SFPlayer::~SFPlayer() {
+    set_stream(nullptr);
+}
+
+void SFPlayer::_process(double delta) {
+    if (Engine::get_singleton()->is_editor_hint()) {
+        // In editor, don't play SoundFont audio data
+        return;
+    }
+    UtilityFunctions::print("SFPlayer _process delta=", delta);
+}
+
+void SFPlayer::_bind_methods() {
 }

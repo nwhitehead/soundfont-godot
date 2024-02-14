@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://dfhsqj7og2fgr"]
+[gd_scene load_steps=7 format=3 uid="uid://dfhsqj7og2fgr"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_526j8"]
 [ext_resource type="SoundFont" uid="uid://dqv1fgei11yfv" path="res://example.sf2" id="2_xg276"]
@@ -9,6 +9,8 @@ buffer_length = 0.03
 
 [sub_resource type="SoundFontPlayer" id="SoundFontPlayer_c3d6h"]
 soundfont = ExtResource("2_xg276")
+
+[sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_sdxoe"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_526j8")
@@ -25,3 +27,6 @@ autoplay = true
 stream = SubResource("SoundFontPlayer_c3d6h")
 autoplay = true
 script = ExtResource("3_brebe")
+
+[node name="SFPlayer" type="SFPlayer" parent="."]
+stream = SubResource("AudioStreamGenerator_sdxoe")
