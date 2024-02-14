@@ -23,9 +23,6 @@ class SoundFont : public Resource {
 
 private:
     Vector<uint8_t> sfdata;
-    tsf * generator;
-    float gain;
-    int max_voices;
 
 protected:
     static void _bind_methods();
@@ -33,13 +30,6 @@ protected:
 public:
     void set_data(const PackedByteArray &p_data);
     PackedByteArray get_data() const;
-
-    void set_gain(float gain);
-    float get_gain() const;
-    void set_max_voices(int max_voices);
-    int get_max_voices() const;
-
-    tsf * get_generator();
 };
 
 /// The node that can play notes and generate audio from a SoundFont
@@ -132,6 +122,10 @@ class SFPlayer : public AudioStreamPlayer {
 
 private:
     Ref<AudioStreamGenerator> genstream;
+    Ref<SoundFont> soundfont;
+    tsf * generator;
+    float gain;
+    int max_voices;
 
 protected:
     static void _bind_methods();
@@ -139,6 +133,15 @@ protected:
 public:
     SFPlayer();
     ~SFPlayer();
+
+    void set_soundfont(Ref<SoundFont> p_soundfont);
+    Ref<SoundFont> get_soundfont() const;
+    void setup_generator();
+
+    void set_gain(float gain);
+    float get_gain() const;
+    void set_max_voices(int max_voices);
+    int get_max_voices() const;
 
     void _process(double delta) override;
 };
