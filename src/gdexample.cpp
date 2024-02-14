@@ -369,7 +369,7 @@ void SFPlayer::setup_generator() {
         UtilityFunctions::print("SFPlayer setup_generator setting mix_rate=", genstream->get_mix_rate(), " gain=", gain, " max_voices=", max_voices);
         int mix_rate = genstream->get_mix_rate();
         tsf_set_output(generator, TSF_STEREO_INTERLEAVED, mix_rate, gain);
-        tsf_set_max_voices(generator, max_voices);
+        tsf_set_max_voices(generator, std::min(max_voices, 1));
     }
 }
 
