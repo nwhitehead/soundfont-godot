@@ -30,8 +30,12 @@ PackedByteArray SoundFont::get_data() const {
 
 SFPlayer::SFPlayer() {
     genstream.instantiate();
+    // Set reasonable snappy default latency
+    genstream->set_buffer_length(0.05 /* seconds */);
     set_stream(genstream);
     generator = nullptr;
+    // Start with quiet gain, for mixing 4 voices at 0 dB
+    // Actual required gain depends on sf2 levels.
     gain = -12.0f;
     max_voices = 32;
     set_autoplay(true);
