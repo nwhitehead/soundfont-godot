@@ -1,6 +1,7 @@
 #ifndef SOUNDFONT_H
 #define SOUNDFONT_H
 
+#include <godot_cpp/classes/audio_stream_generator.hpp>
 #include <godot_cpp/classes/ref.hpp>
 #include <godot_cpp/classes/resource.hpp>
 #include <godot_cpp/classes/node.hpp>
@@ -15,6 +16,7 @@ namespace godot {
 /// A resource the represents the .sf2 file contents
 // Uses PackedByteArray in interface with gdscript because I couldn't get Vector<> working for that.
 class SoundFont : public Resource {
+
     GDCLASS(SoundFont, Resource)
 
 private:
@@ -31,6 +33,7 @@ public:
 
 /// The node that can play notes and generate audio from a SoundFont
 class SoundFontGenerator : public Node {
+
     GDCLASS(SoundFontGenerator, Node)
 
 private:
@@ -75,6 +78,34 @@ public:
     void bank_note_off(int bank, int preset_number, int key);
 
     PackedVector2Array render(int samples);
+};
+
+class SoundFontPlayer : public AudioStreamGenerator {
+
+    GDCLASS(SoundFontPlayer, AudioStreamGenerator)
+
+private:
+    float gain;
+    int max_voices;
+    Ref<SoundFont> soundfont;
+    tsf * generator;
+
+protected:
+    static void _bind_methods();
+
+public:
+    SoundFontPlayer();
+    ~SoundFontPlayer();
+
+    void set_soundfont(Ref<SoundFont> p_resource);
+    Ref<SoundFont> get_soundfont() const;
+    void setup_generator();
+
+    void set_gain(float gain);
+    float get_gain() const;
+    void set_max_voices(int max_voices);
+    int get_max_voices() const;
+
 };
 
 }

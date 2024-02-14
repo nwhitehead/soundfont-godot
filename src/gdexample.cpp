@@ -40,16 +40,16 @@ SoundFontGenerator::SoundFontGenerator() {
     generator = nullptr;
 }
 
+SoundFontGenerator::~SoundFontGenerator() {
+    if (generator) {
+        tsf_close(generator);
+    }
+}
+
 void SoundFontGenerator::setup_generator() {
     if (generator) {
         tsf_set_output(generator, stereo ? TSF_STEREO_INTERLEAVED : TSF_MONO, static_cast<int>(mix_rate), gain);
         tsf_set_max_voices(generator, max_voices);
-    }
-}
-
-SoundFontGenerator::~SoundFontGenerator() {
-    if (generator) {
-        tsf_close(generator);
     }
 }
 
@@ -233,4 +233,76 @@ void SoundFontGenerator::_bind_methods() {
     ClassDB::bind_method(D_METHOD("note_off", "preset_index", "key"), &SoundFontGenerator::note_off);
     ClassDB::bind_method(D_METHOD("bank_note_off", "bank", "preset_number", "key"), &SoundFontGenerator::bank_note_off);
     ClassDB::bind_method(D_METHOD("render", "samples"), &SoundFontGenerator::render);
+}
+
+SoundFontPlayer::SoundFontPlayer() {
+    gain = -12.0f;
+    max_voices = 32;
+    generator = nullptr;
+}
+
+SoundFontPlayer::~SoundFontPlayer() {
+    if (generator) {
+        tsf_close(generator);
+    }
+}
+
+void SoundFontPlayer::setup_generator() {
+    if (generator) {
+        int mix_rate = get_mix_rate();
+        tsf_set_output(generator, TSF_STEREO_INTERLEAVED, mix_rate, gain);
+        tsf_set_max_voices(generator, max_voices);
+    }
+}
+
+void SoundFontPlayer::set_gain(float p_gain) {
+    gain = p_gain;
+    setup_generator();
+}
+
+float SoundFontPlayer::get_gain() const {
+    return gain;
+}
+
+void SoundFontPlayer::set_max_voices(int p_max_voices) {
+    max_voices = p_max_voices;
+    setup_generator();
+}
+
+int SoundFontPlayer::get_max_voices() const {
+    return max_voices;
+}
+
+void SoundFontPlayer::set_soundfont(Ref<SoundFont> p_soundfont) {
+    if (generator) {
+        tsf_close(generator);
+        generator = nullptr;
+    }
+    soundfont = p_soundfont;
+    if (soundfont.is_valid() && soundfont->get_data().size()) {
+        UtilityFunctions::print("SoundFontPlayer set_soundfont called, size=", soundfont->get_data().size());
+        generator = tsf_load_memory(soundfont->get_data().ptr(), soundfont->get_data().size());
+        if (!generator) {
+            UtilityFunctions::printerr("Error parsing SF2 resource inside SoundFontPlayer");
+        }
+    } else {
+        UtilityFunctions::print("SoundFontPlayer set_soundfont called (empty soundfont)");
+    }
+    setup_generator();
+}
+
+Ref<SoundFont> SoundFontPlayer::get_soundfont() const {
+    return soundfont;
+}
+
+void SoundFontPlayer::_bind_methods() {
+    ClassDB::bind_method(D_METHOD("set_soundfont", "soundfont"), &SoundFontPlayer::set_soundfont);
+    ClassDB::bind_method(D_METHOD("get_soundfont"), &SoundFontPlayer::get_soundfont);
+    ClassDB::bind_method(D_METHOD("set_gain", "gain"), &SoundFontPlayer::set_gain);
+    ClassDB::bind_method(D_METHOD("get_gain"), &SoundFontPlayer::get_gain);
+    ClassDB::bind_method(D_METHOD("set_max_voices", "max_voices"), &SoundFontPlayer::set_max_voices);
+    ClassDB::bind_method(D_METHOD("get_max_voices"), &SoundFontPlayer::get_max_voices);
+    ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "soundfont", PROPERTY_HINT_RESOURCE_TYPE, "SoundFont"), "set_soundfont", "get_soundfont");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "gain", PROPERTY_HINT_RANGE, "-48.0,12.0,0.1,suffix:dB"), "set_gain", "get_gain");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_voices", PROPERTY_HINT_RANGE, "1,256,1"), "set_max_voices", "get_max_voices");
 }

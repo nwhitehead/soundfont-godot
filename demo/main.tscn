@@ -1,11 +1,13 @@
-[gd_scene load_steps=4 format=3 uid="uid://dfhsqj7og2fgr"]
+[gd_scene load_steps=5 format=3 uid="uid://dfhsqj7og2fgr"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_526j8"]
 
 [sub_resource type="SoundFont" id="SoundFont_cssh6"]
 
-[sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_3b46x"]
-buffer_length = 0.03
+[sub_resource type="SoundFont" id="SoundFont_xile8"]
+
+[sub_resource type="SoundFontPlayer" id="SoundFontPlayer_7xh2i"]
+soundfont = SubResource("SoundFont_xile8")
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_526j8")
@@ -16,5 +18,5 @@ stereo = false
 gain = -10.5
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="SoundFontGenerator"]
-stream = SubResource("AudioStreamGenerator_3b46x")
+stream = SubResource("SoundFontPlayer_7xh2i")
 autoplay = true
