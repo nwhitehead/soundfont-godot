@@ -11,16 +11,8 @@ using namespace godot;
 void SoundFont::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_data", "data"), &SoundFont::set_data);
     ClassDB::bind_method(D_METHOD("get_data"), &SoundFont::get_data);
-    ClassDB::bind_method(D_METHOD("get_first"), &SoundFont::get_first);
     ADD_PROPERTY(PropertyInfo(Variant::PACKED_BYTE_ARRAY, "data"), "set_data", "get_data");
 
-}
-
-int SoundFont::get_first() const {
-    if (sfdata.size() > 0) {
-        return sfdata[0];
-    }
-    return -1;
 }
 
 void SoundFont::set_data(const PackedByteArray &p_data) {

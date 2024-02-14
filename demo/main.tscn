@@ -4,6 +4,7 @@
 [ext_resource type="SoundFont" uid="uid://dqv1fgei11yfv" path="res://example.sf2" id="2_xg276"]
 
 [sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_svpsi"]
+buffer_length = 0.03
 
 [sub_resource type="SoundFontPlayer" id="SoundFontPlayer_xy7lm"]
 soundfont = ExtResource("2_xg276")

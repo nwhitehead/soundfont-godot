@@ -15,6 +15,7 @@ namespace godot {
 
 /// A resource the represents the .sf2 file contents
 // Uses PackedByteArray in interface with gdscript because I couldn't get Vector<> working for that.
+// Explicitly includes `sfdata` in the properties exported so that it will be serialized.
 class SoundFont : public Resource {
 
     GDCLASS(SoundFont, Resource)
@@ -28,7 +29,6 @@ protected:
 public:
     void set_data(const PackedByteArray &p_data);
     PackedByteArray get_data() const;
-    int get_first() const;
 };
 
 /// The node that can play notes and generate audio from a SoundFont

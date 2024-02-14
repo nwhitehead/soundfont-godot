@@ -32,20 +32,10 @@ func _get_import_order():
 	return 2
 
 func _import(source_file, save_path, options, r_platform_variants, r_gen_files):
-	print('_import called')
-	var test = SoundFont.new()
-	print(test.get_first())
 	var file = FileAccess.open(source_file, FileAccess.READ)
 	if file == null:
 		return FileAccess.get_open_error()
-	print('importing!!!')
 	var data = file.get_buffer(file.get_length())
-	print('data=', data)
 	var sf = SoundFont.new()
 	sf.set_data(data)
-	print('first=', sf.get_first())
-	var fname = "%s.%s" % [save_path, _get_save_extension()]
-	print('fname=', fname)
-	var res = ResourceSaver.save(sf, fname)
-	print(res)
-	return res
+	return ResourceSaver.save(sf, "%s.%s" % [save_path, _get_save_extension()])
