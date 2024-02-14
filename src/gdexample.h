@@ -106,6 +106,11 @@ public:
     void set_max_voices(int max_voices);
     int get_max_voices() const;
 
+    int get_presetindex(int bank, int preset_number) const;
+    int get_presetcount() const;
+    String get_presetname(int preset_index) const;
+    String bank_get_presetname(int bank, int preset_number) const;
+
 };
 
 }

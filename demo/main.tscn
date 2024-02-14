@@ -14,12 +14,11 @@ script = ExtResource("1_526j8")
 
 [node name="SoundFontGenerator" type="SoundFontGenerator" parent="."]
 soundfont = ExtResource("2_xg276")
-stereo = false
-gain = -10.5
+gain = -20.5
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="SoundFontGenerator"]
 stream = SubResource("AudioStreamGenerator_svpsi")
 autoplay = true
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+[node name="Instrument" type="AudioStreamPlayer" parent="."]
 stream = SubResource("SoundFontPlayer_xy7lm")

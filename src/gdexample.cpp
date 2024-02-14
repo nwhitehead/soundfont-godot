@@ -292,6 +292,36 @@ Ref<SoundFont> SoundFontPlayer::get_soundfont() const {
     return soundfont;
 }
 
+int SoundFontPlayer::get_presetindex(int bank, int preset_number) const {
+    if (!generator) {
+        return -1;
+    }
+    return tsf_get_presetindex(generator, bank, preset_number);
+}
+
+int SoundFontPlayer::get_presetcount() const {
+    if (!generator) {
+        return -1;
+    }
+    return tsf_get_presetcount(generator);
+}
+
+String SoundFontPlayer::get_presetname(int preset_index) const {
+    if (!generator) {
+        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontPlayer");
+        return String("");
+    }
+    return String(tsf_get_presetname(generator, preset_index));
+}
+
+String SoundFontPlayer::bank_get_presetname(int bank, int preset_number) const {
+    if (!generator) {
+        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontPlayer");
+        return String("");
+    }
+    return String(tsf_bank_get_presetname(generator, bank, preset_number));
+}
+
 void SoundFontPlayer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_soundfont", "soundfont"), &SoundFontPlayer::set_soundfont);
     ClassDB::bind_method(D_METHOD("get_soundfont"), &SoundFontPlayer::get_soundfont);
@@ -302,4 +332,9 @@ void SoundFontPlayer::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "soundfont", PROPERTY_HINT_RESOURCE_TYPE, "SoundFont"), "set_soundfont", "get_soundfont");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "gain", PROPERTY_HINT_RANGE, "-48.0,12.0,0.1,suffix:dB"), "set_gain", "get_gain");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_voices", PROPERTY_HINT_RANGE, "1,256,1"), "set_max_voices", "get_max_voices");
+
+    ClassDB::bind_method(D_METHOD("get_presetindex", "bank", "preset_number"), &SoundFontPlayer::get_presetindex);
+    ClassDB::bind_method(D_METHOD("get_presetcount"), &SoundFontPlayer::get_presetcount);
+    ClassDB::bind_method(D_METHOD("get_presetname", "preset_index"), &SoundFontPlayer::get_presetname);
+    ClassDB::bind_method(D_METHOD("bank_get_presetname", "bank", "preset_number"), &SoundFontPlayer::bank_get_presetname);
 }
