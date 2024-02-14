@@ -6,7 +6,7 @@ var playback: AudioStreamPlayback = null # Actual playback stream, assigned in _
 var time: float = 0.0
 # 42 # cello
 # 58 # tuba
-var preset: int = 58
+var preset: int = 1
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -22,11 +22,15 @@ func _ready():
 	# sfg.note_on(0, 44 - 24, 1.0)
 	var out = sfg.render(10)
 	print(out)
+	_fill_buffer(0)
 
-func _fill_buffer():
+func _fill_buffer(delta):
 	var samples: int = playback.get_frames_available()
-	if samples > 0:
-		playback.push_buffer(sfg.render(samples))
+	#var our_samples: int = min(samples, 44100/100) + 10
+	var our_samples: int = min(samples, delta * 44100)
+	print(delta, " : ", our_samples, " / ", samples)
+	if our_samples > 0:
+		playback.push_buffer(sfg.render(our_samples))
 
 func _input(event):
 	var notes = {
@@ -49,4 +53,4 @@ func _input(event):
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	time += delta
-	_fill_buffer()
+	_fill_buffer(delta)

@@ -5,7 +5,7 @@
 [sub_resource type="SoundFont" id="SoundFont_cssh6"]
 
 [sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_3b46x"]
-buffer_length = 0.05
+buffer_length = 0.03
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_526j8")
@@ -13,7 +13,7 @@ script = ExtResource("1_526j8")
 [node name="SoundFontGenerator" type="SoundFontGenerator" parent="."]
 soundfont = SubResource("SoundFont_cssh6")
 stereo = false
-gain = -7.8
+gain = -10.5
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="SoundFontGenerator"]
 stream = SubResource("AudioStreamGenerator_3b46x")
