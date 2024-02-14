@@ -4,6 +4,7 @@
 [ext_resource type="SoundFont" uid="uid://dqv1fgei11yfv" path="res://example.sf2" id="2_xg276"]
 
 [sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_8q3mv"]
+buffer_length = 0.03
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_526j8")

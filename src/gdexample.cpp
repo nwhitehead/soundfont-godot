@@ -48,7 +48,6 @@ SFPlayer::~SFPlayer() {
 
 void SFPlayer::setup_generator() {
     if (generator && genstream.is_valid()) {
-        UtilityFunctions::print("SFPlayer setup_generator setting mix_rate=", genstream->get_mix_rate(), " gain=", gain, " max_voices=", max_voices);
         int mix_rate = genstream->get_mix_rate();
         tsf_set_output(generator, TSF_STEREO_INTERLEAVED, mix_rate, gain);
         tsf_set_max_voices(generator, std::min(max_voices, 1));
@@ -62,16 +61,21 @@ void SFPlayer::_process(double delta) {
     }
     if (!genstream.is_valid()) {
         // stream needs to be valid to generate anything
-        UtilityFunctions::print("SFPlayer _process invalid genstream");
         return;
     }
     Ref<AudioStreamGeneratorPlayback> playback = get_stream_playback();
     if (!playback.is_valid()) {
-        UtilityFunctions::print("SFPlayer _process invalid playback stream");
+        // If there is no playback, stop
         return;
     }
     int available = playback->get_frames_available();
-    UtilityFunctions::print("SFPlayer _process delta=", delta, " available=", available);
+    int samples = std::min(static_cast<int>(delta * genstream->get_mix_rate()), available);
+    if (!samples) {
+        // Nothing to render
+        return;
+    }
+    playback->push_buffer(render(samples));
+    UtilityFunctions::print("SFPlayer _process delta=", delta, " samples=", samples, " available=", available);
 }
 
 void SFPlayer::set_soundfont(Ref<SoundFont> p_soundfont) {
