@@ -10,6 +10,8 @@ var player: SFPlayer = null
 func _ready():
 	player = $SFPlayer
 	print(player.get_presetname(0))
+	player.note_on(0, 44, 1.0)
+	#player.process(1.0)
 	#sfg = $SoundFontGenerator
 	#playback = sfg.get_node("AudioStreamPlayer").get_stream_playback();
 	#print("From SoundFontGenerator: ", sfg.get_presetname(preset))

@@ -46,6 +46,7 @@ private:
 
 protected:
     static void _bind_methods();
+    PackedVector2Array render(int samples);
 
 public:
     SFPlayer();
@@ -68,8 +69,6 @@ public:
     void bank_note_on(int bank, int preset_number, int key, float velocity);
     void note_off(int preset_index, int key);
     void bank_note_off(int bank, int preset_number, int key);
-
-    PackedVector2Array render(int samples);
 
     void _process(double delta) override;
 };

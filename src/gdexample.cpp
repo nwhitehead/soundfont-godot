@@ -210,9 +210,14 @@ void SFPlayer::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "soundfont", PROPERTY_HINT_RESOURCE_TYPE, "SoundFont"), "set_soundfont", "get_soundfont");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "gain", PROPERTY_HINT_RANGE, "-48.0,12.0,0.1,suffix:dB"), "set_gain", "get_gain");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_voices", PROPERTY_HINT_RANGE, "1,256,1"), "set_max_voices", "get_max_voices");
-
     ClassDB::bind_method(D_METHOD("get_presetindex", "bank", "preset_number"), &SFPlayer::get_presetindex);
     ClassDB::bind_method(D_METHOD("get_presetcount"), &SFPlayer::get_presetcount);
     ClassDB::bind_method(D_METHOD("get_presetname", "preset_index"), &SFPlayer::get_presetname);
     ClassDB::bind_method(D_METHOD("bank_get_presetname", "bank", "preset_number"), &SFPlayer::bank_get_presetname);
+    ClassDB::bind_method(D_METHOD("note_on", "preset_index", "key", "velocity"), &SFPlayer::note_on);
+    ClassDB::bind_method(D_METHOD("bank_note_on", "bank", "preset_number", "key", "velocity"), &SFPlayer::bank_note_on);
+    ClassDB::bind_method(D_METHOD("note_off", "preset_index", "key"), &SFPlayer::note_off);
+    ClassDB::bind_method(D_METHOD("bank_note_off", "bank", "preset_number", "key"), &SFPlayer::bank_note_off);
+    ClassDB::bind_method(D_METHOD("process", "delta"), &SFPlayer::_process);
+
 }
