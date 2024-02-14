@@ -97,6 +97,8 @@ public:
     SoundFontPlayer();
     ~SoundFontPlayer();
 
+    void _process(double delta);
+
     void set_soundfont(Ref<SoundFont> p_resource);
     Ref<SoundFont> get_soundfont() const;
     void setup_generator();

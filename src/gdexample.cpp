@@ -322,6 +322,10 @@ String SoundFontPlayer::bank_get_presetname(int bank, int preset_number) const {
     return String(tsf_bank_get_presetname(generator, bank, preset_number));
 }
 
+void SoundFontPlayer::_process(double delta) {
+    UtilityFunctions::print("SoundFontPlayer _process delta=", delta);
+}
+
 void SoundFontPlayer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_soundfont", "soundfont"), &SoundFontPlayer::set_soundfont);
     ClassDB::bind_method(D_METHOD("get_soundfont"), &SoundFontPlayer::get_soundfont);
@@ -337,4 +341,7 @@ void SoundFontPlayer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_presetcount"), &SoundFontPlayer::get_presetcount);
     ClassDB::bind_method(D_METHOD("get_presetname", "preset_index"), &SoundFontPlayer::get_presetname);
     ClassDB::bind_method(D_METHOD("bank_get_presetname", "bank", "preset_number"), &SoundFontPlayer::bank_get_presetname);
+
+    ClassDB::bind_method(D_METHOD("_process", "delta"), &SoundFontPlayer::_process);
+
 }

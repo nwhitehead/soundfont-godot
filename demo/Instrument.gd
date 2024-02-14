@@ -6,4 +6,5 @@ func _ready():
 	print(player.get_presetname(0))
 
 func _process(delta):
-	print(delta)
+	pass
+	# print(delta)
