@@ -35,6 +35,7 @@ SFPlayer::SFPlayer() {
     gain = -12.0f;
     max_voices = 32;
     set_autoplay(true);
+    prefilled = false;
 }
 
 SFPlayer::~SFPlayer() {
@@ -50,7 +51,7 @@ void SFPlayer::setup_generator() {
     if (generator && genstream.is_valid()) {
         int mix_rate = genstream->get_mix_rate();
         tsf_set_output(generator, TSF_STEREO_INTERLEAVED, mix_rate, gain);
-        tsf_set_max_voices(generator, std::min(max_voices, 1));
+        tsf_set_max_voices(generator, std::max(max_voices, 1));
     }
 }
 
@@ -68,6 +69,11 @@ void SFPlayer::_process(double delta) {
         // If there is no playback, stop
         return;
     }
+    if (!prefilled) {
+        // On first call, prefill buffers as much as possible to avoid glitches on first load
+        delta = 1.0;
+        prefilled = true;
+    }
     int available = playback->get_frames_available();
     int samples = std::min(static_cast<int>(delta * genstream->get_mix_rate()), available);
     if (!samples) {
@@ -75,7 +81,7 @@ void SFPlayer::_process(double delta) {
         return;
     }
     playback->push_buffer(render(samples));
-    UtilityFunctions::print("SFPlayer _process delta=", delta, " samples=", samples, " available=", available);
+    // UtilityFunctions::print("SFPlayer _process delta=", delta, " samples=", samples, " available=", available);
 }
 
 void SFPlayer::set_soundfont(Ref<SoundFont> p_soundfont) {

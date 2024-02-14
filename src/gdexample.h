@@ -43,6 +43,7 @@ private:
     tsf * generator;
     float gain;
     int max_voices;
+    bool prefilled;
 
 protected:
     static void _bind_methods();
