@@ -9,7 +9,7 @@ var preset: int = 0
 func _ready():
 	sfg = $SoundFontGenerator
 	playback = sfg.get_node("AudioStreamPlayer").get_stream_playback();
-	print(sfg.get_presetname(preset))
+	print("From SoundFontGenerator: ", sfg.get_presetname(preset))
 	# Avoid startup audio glitch by prefilling buffer
 	_fill_buffer(1/60)
 
@@ -17,7 +17,7 @@ func _fill_buffer(delta):
 	var samples: int = playback.get_frames_available()
 	#var our_samples: int = min(samples, 44100/100) + 10
 	var our_samples: int = min(samples, delta * 44100)
-	print(delta, " : ", our_samples, " / ", samples)
+	# print(delta, " : ", our_samples, " / ", samples)
 	if our_samples > 0:
 		playback.push_buffer(sfg.render(our_samples))
 
