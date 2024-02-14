@@ -1,12 +1,15 @@
 extends Node2D
 
-var sfg: SoundFontGenerator = null
-var playback: AudioStreamPlayback = null
+#var sfg: SoundFontGenerator = null
+#var playback: AudioStreamPlayback = null
 # 42 # cello
 # 58 # tuba
 var preset: int = 0
+var player: SFPlayer = null
 
-#func _ready():
+func _ready():
+	player = $SFPlayer
+	print(player.get_presetname(0))
 	#sfg = $SoundFontGenerator
 	#playback = sfg.get_node("AudioStreamPlayer").get_stream_playback();
 	#print("From SoundFontGenerator: ", sfg.get_presetname(preset))
