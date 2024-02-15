@@ -75,7 +75,7 @@ public:
     void note_off(int preset_index, int key);
     void bank_note_off(int bank, int preset_number, int key);
 
-    void _process(double delta) override;
+    void _physics_process();
 };
 
 

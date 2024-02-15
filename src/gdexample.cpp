@@ -63,7 +63,8 @@ void SFPlayer::setup_generator() {
     }
 }
 
-void SFPlayer::_process(double delta) {
+void SFPlayer::_physics_process() {
+    double delta = 1.0/60.0;
     if (Engine::get_singleton()->is_editor_hint()) {
         // In editor, don't play SoundFont audio data
         return;
@@ -80,7 +81,7 @@ void SFPlayer::_process(double delta) {
     }
     if (!prefilled) {
         // On first call, prefill buffers as much as possible to avoid glitches on first load
-//        delta = 1.0;
+        delta = 1.0;
         prefilled = true;
     }
     float mix_rate = stream->get_mix_rate();
@@ -88,23 +89,19 @@ void SFPlayer::_process(double delta) {
     int available = playback->get_frames_available();
     max_samples_available = std::max(max_samples_available, available);
     int goal_available = static_cast<int>(max_samples_available * goal_available_ratio);
-    // If buffer is almost full, never overfill (cut down samples with min)
-    int samples = 0;
+    int ideal_samples = static_cast<int>(delta * mix_rate);
     // If buffer is too empty, use large samples to help fill it up
     // Otherwise use small samples to let it drain
-    if (available > goal_available) {
-        int large_samples = static_cast<int>(delta * mix_rate * 1.01f);
-        samples = std::min(large_samples, available);
-    } else {
-        int small_samples = static_cast<int>(delta * mix_rate * 0.99f);
-        samples = std::min(small_samples, available);
-    }
+    // Push number of samples to correct part of gap to goal_available
+    int samples = ideal_samples + (available - goal_available) / 32;
+    // If buffer is almost full, never overfill (cut down samples with min)
+    samples = std::max(std::min(samples, available), 0);
     if (!samples) {
         // Nothing to render
         return;
     }
     playback->push_buffer(render(samples));
-    UtilityFunctions::print("SFPlayer _process delta=", delta, " samples=", samples, " available=", available);
+    // // UtilityFunctions::print("SFPlayer _process delta=", delta, " samples=", samples, " available=", available, " diff=", samples - ideal_samples);
 }
 
 void SFPlayer::set_soundfont(Ref<SoundFont> p_soundfont) {
@@ -259,5 +256,5 @@ void SFPlayer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("bank_note_on", "bank", "preset_number", "key", "velocity"), &SFPlayer::bank_note_on);
     ClassDB::bind_method(D_METHOD("note_off", "preset_index", "key"), &SFPlayer::note_off);
     ClassDB::bind_method(D_METHOD("bank_note_off", "bank", "preset_number", "key"), &SFPlayer::bank_note_off);
-    ClassDB::bind_method(D_METHOD("process", "delta"), &SFPlayer::_process);
+    ClassDB::bind_method(D_METHOD("physics_process"), &SFPlayer::_physics_process);
 }
