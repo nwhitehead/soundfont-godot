@@ -5,10 +5,10 @@ extends Node2D
 # 42 # cello
 # 58 # tuba
 var preset: int = 0
-var player: SFPlayer = null
+var player: SoundFontPlayer = null
 
 func _ready():
-	player = $SFPlayer
+	player = $SoundFontPlayer
 	print(player.get_playback_position())
 	print(player.get_stream().get_buffer_length())
 	print(AudioServer.get_time_to_next_mix())

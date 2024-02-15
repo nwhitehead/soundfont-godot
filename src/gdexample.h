@@ -33,16 +33,15 @@ public:
     PackedByteArray get_data() const;
 };
 
-class SFPlayer : public AudioStreamPlayer {
+class SoundFontPlayer : public AudioStreamPlayer {
 
-    GDCLASS(SFPlayer, AudioStreamPlayer)
+    GDCLASS(SoundFontPlayer, AudioStreamPlayer)
 
 private:
     Ref<SoundFont> soundfont;
     tsf * generator;
     float gain;
     int max_voices;
-    bool prefilled;
     double time;
     float goal_available_ratio;
     int max_samples_available;
@@ -52,8 +51,8 @@ protected:
     PackedVector2Array render(int samples);
 
 public:
-    SFPlayer();
-    ~SFPlayer();
+    SoundFontPlayer();
+    ~SoundFontPlayer();
 
     void set_soundfont(Ref<SoundFont> p_soundfont);
     Ref<SoundFont> get_soundfont() const;

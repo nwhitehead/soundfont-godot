@@ -1,7 +1,7 @@
 [icons]
 
 SoundFont = "res://icon.svg"
-SFPlayer = "res://icon.svg"
+SoundFontPlayer = "res://icon.svg"
 
 [configuration]
 

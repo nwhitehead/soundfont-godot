@@ -3,13 +3,12 @@
 [ext_resource type="Script" path="res://main.gd" id="1_526j8"]
 [ext_resource type="SoundFont" uid="uid://dqv1fgei11yfv" path="res://example.sf2" id="2_xg276"]
 
-[sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_j33bc"]
+[sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_ckiyt"]
 buffer_length = 0.1
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_526j8")
 
-[node name="SFPlayer" type="SFPlayer" parent="."]
+[node name="SoundFontPlayer" type="SoundFontPlayer" parent="."]
 soundfont = ExtResource("2_xg276")
-goal_available_ratio = 0.8
-stream = SubResource("AudioStreamGenerator_j33bc")
+stream = SubResource("AudioStreamGenerator_ckiyt")

@@ -28,11 +28,11 @@ PackedByteArray SoundFont::get_data() const {
     return result;
 }
 
-SFPlayer::SFPlayer() {
+SoundFontPlayer::SoundFontPlayer() {
     Ref<AudioStreamGenerator> genstream;
     genstream.instantiate();
     // Set reasonable snappy default latency
-    genstream->set_buffer_length(0.05 /* seconds */);
+    genstream->set_buffer_length(0.1 /* seconds */);
     set_stream(genstream);
     generator = nullptr;
     // Start with quiet gain, for mixing 4 voices at 0 dB
@@ -40,13 +40,13 @@ SFPlayer::SFPlayer() {
     gain = -12.0f;
     max_voices = 32;
     set_autoplay(true);
-    prefilled = false;
     time = 0.0;
-    goal_available_ratio = 1.0f;
+    // Default goal is to have 80% of buffer available (so use 20% of 100 ms for buffer, about 20 ms of buffer delay)
+    goal_available_ratio = 0.8f;
     max_samples_available = 0;
 }
 
-SFPlayer::~SFPlayer() {
+SoundFontPlayer::~SoundFontPlayer() {
     set_stream(nullptr);
     if (generator) {
         tsf_close(generator);
@@ -54,7 +54,7 @@ SFPlayer::~SFPlayer() {
     }
 }
 
-void SFPlayer::setup_generator() {
+void SoundFontPlayer::setup_generator() {
     Ref<AudioStreamGenerator> stream = get_stream();
     if (generator && stream.is_valid()) {
         int mix_rate = stream->get_mix_rate();
@@ -63,31 +63,33 @@ void SFPlayer::setup_generator() {
     }
 }
 
-void SFPlayer::_physics_process() {
+void SoundFontPlayer::_physics_process() {
     double delta = 1.0/60.0;
     if (Engine::get_singleton()->is_editor_hint()) {
         // In editor, don't play SoundFont audio data
+        // Also reset max_samples_available in case buffer settings modified
+        max_samples_available = 0;
         return;
     }
     Ref<AudioStreamGenerator> stream = get_stream();
     if (!stream.is_valid()) {
         // stream needs to be valid AudioStreamGenerator to generate anything
+        max_samples_available = 0;
         return;
     }
     Ref<AudioStreamGeneratorPlayback> playback = get_stream_playback();
     if (!playback.is_valid()) {
         // If there is no playback, stop
+        max_samples_available = 0;
         return;
-    }
-    if (!prefilled) {
-        // On first call, prefill buffers as much as possible to avoid glitches on first load
-        delta = 1.0;
-        prefilled = true;
     }
     float mix_rate = stream->get_mix_rate();
     float buffer_length = stream->get_buffer_length();
     int available = playback->get_frames_available();
-    max_samples_available = std::max(max_samples_available, available);
+    // Just set max_samples_available on first call
+    if (max_samples_available == 0) {
+        max_samples_available = std::max(max_samples_available, available);
+    }
     int goal_available = static_cast<int>(max_samples_available * goal_available_ratio);
     int ideal_samples = static_cast<int>(delta * mix_rate);
     // If buffer is too empty, use large samples to help fill it up
@@ -101,91 +103,89 @@ void SFPlayer::_physics_process() {
         return;
     }
     playback->push_buffer(render(samples));
-    // // UtilityFunctions::print("SFPlayer _process delta=", delta, " samples=", samples, " available=", available, " diff=", samples - ideal_samples);
 }
 
-void SFPlayer::set_soundfont(Ref<SoundFont> p_soundfont) {
+void SoundFontPlayer::set_soundfont(Ref<SoundFont> p_soundfont) {
     if (generator) {
         tsf_close(generator);
         generator = nullptr;
     }
     soundfont = p_soundfont;
     if (soundfont.is_valid() && soundfont->get_data().size()) {
-        UtilityFunctions::print("SFPlayer set_soundfont called, size=", soundfont->get_data().size());
+        UtilityFunctions::print("SoundFontPlayer set_soundfont called, size=", soundfont->get_data().size());
         generator = tsf_load_memory(soundfont->get_data().ptr(), soundfont->get_data().size());
         if (!generator) {
-            UtilityFunctions::printerr("Error parsing SF2 resource inside SFPlayer");
+            UtilityFunctions::printerr("Error parsing SF2 resource inside SoundFontPlayer");
         }
     } else {
-        UtilityFunctions::print("SFPlayer set_soundfont called (empty soundfont)");
+        UtilityFunctions::print("SoundFontPlayer set_soundfont called (empty soundfont)");
     }
     setup_generator();
 }
 
-Ref<SoundFont> SFPlayer::get_soundfont() const {
+Ref<SoundFont> SoundFontPlayer::get_soundfont() const {
     return soundfont;
 }
 
-void SFPlayer::set_gain(float p_gain) {
+void SoundFontPlayer::set_gain(float p_gain) {
     gain = p_gain;
     setup_generator();
 }
 
-float SFPlayer::get_gain() const {
+float SoundFontPlayer::get_gain() const {
     return gain;
 }
 
-void SFPlayer::set_max_voices(int p_max_voices) {
+void SoundFontPlayer::set_max_voices(int p_max_voices) {
     max_voices = p_max_voices;
     setup_generator();
 }
 
-int SFPlayer::get_max_voices() const {
+int SoundFontPlayer::get_max_voices() const {
     return max_voices;
 }
 
-void SFPlayer::set_goal_available_ratio(float p_goal_available_ratio) {
+void SoundFontPlayer::set_goal_available_ratio(float p_goal_available_ratio) {
     goal_available_ratio = p_goal_available_ratio;
 }
 
-float SFPlayer::get_goal_available_ratio() const {
+float SoundFontPlayer::get_goal_available_ratio() const {
     return goal_available_ratio;
 }
 
-
-int SFPlayer::get_presetindex(int bank, int preset_number) const {
+int SoundFontPlayer::get_presetindex(int bank, int preset_number) const {
     if (!generator) {
         return -1;
     }
     return tsf_get_presetindex(generator, bank, preset_number);
 }
 
-int SFPlayer::get_presetcount() const {
+int SoundFontPlayer::get_presetcount() const {
     if (!generator) {
         return -1;
     }
     return tsf_get_presetcount(generator);
 }
 
-String SFPlayer::get_presetname(int preset_index) const {
+String SoundFontPlayer::get_presetname(int preset_index) const {
     if (!generator) {
-        UtilityFunctions::printerr("No SoundFont generator loaded in SFPlayer");
+        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontPlayer");
         return String("");
     }
     return String(tsf_get_presetname(generator, preset_index));
 }
 
-String SFPlayer::bank_get_presetname(int bank, int preset_number) const {
+String SoundFontPlayer::bank_get_presetname(int bank, int preset_number) const {
     if (!generator) {
-        UtilityFunctions::printerr("No SoundFont generator loaded in SFPlayer");
+        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontPlayer");
         return String("");
     }
     return String(tsf_bank_get_presetname(generator, bank, preset_number));
 }
 
-void SFPlayer::note_on(int preset_index, int key, float velocity) {
+void SoundFontPlayer::note_on(int preset_index, int key, float velocity) {
     if (!generator) {
-        UtilityFunctions::printerr("No SoundFont generator loaded in SFPlayer");
+        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontPlayer");
         return;
     }
     if (!tsf_note_on(generator, preset_index, key, velocity)) {
@@ -194,9 +194,9 @@ void SFPlayer::note_on(int preset_index, int key, float velocity) {
     }
 }
 
-void SFPlayer::bank_note_on(int bank, int preset_number, int key, float velocity) {
+void SoundFontPlayer::bank_note_on(int bank, int preset_number, int key, float velocity) {
     if (!generator) {
-        UtilityFunctions::printerr("No SoundFont generator loaded in SFPlayer");
+        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontPlayer");
         return;
     }
     if (!tsf_bank_note_on(generator, bank, preset_number, key, velocity)) {
@@ -205,17 +205,17 @@ void SFPlayer::bank_note_on(int bank, int preset_number, int key, float velocity
     }
 }
 
-void SFPlayer::note_off(int preset_index, int key) {
+void SoundFontPlayer::note_off(int preset_index, int key) {
     if (!generator) {
-        UtilityFunctions::printerr("No SoundFont generator loaded in SFPlayer");
+        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontPlayer");
         return;
     }
     tsf_note_off(generator, preset_index, key);
 }
 
-void SFPlayer::bank_note_off(int bank, int preset_number, int key) {
+void SoundFontPlayer::bank_note_off(int bank, int preset_number, int key) {
     if (!generator) {
-        UtilityFunctions::printerr("No SoundFont generator loaded in SFPlayer");
+        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontPlayer");
         return;
     }
     if (!tsf_bank_note_off(generator, bank, preset_number, key)) {
@@ -224,10 +224,10 @@ void SFPlayer::bank_note_off(int bank, int preset_number, int key) {
     }
 }
 
-PackedVector2Array SFPlayer::render(int samples) {
+PackedVector2Array SoundFontPlayer::render(int samples) {
     PackedVector2Array result{};
     if (!generator) {
-        UtilityFunctions::printerr("No SoundFont generator loaded in SFPlayer");
+        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontPlayer");
         return result;
     }
     result.resize(samples);
@@ -235,26 +235,26 @@ PackedVector2Array SFPlayer::render(int samples) {
     return result;
 }
 
-void SFPlayer::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("set_soundfont", "soundfont"), &SFPlayer::set_soundfont);
-    ClassDB::bind_method(D_METHOD("get_soundfont"), &SFPlayer::get_soundfont);
-    ClassDB::bind_method(D_METHOD("set_gain", "gain"), &SFPlayer::set_gain);
-    ClassDB::bind_method(D_METHOD("get_gain"), &SFPlayer::get_gain);
-    ClassDB::bind_method(D_METHOD("set_max_voices", "max_voices"), &SFPlayer::set_max_voices);
-    ClassDB::bind_method(D_METHOD("get_max_voices"), &SFPlayer::get_max_voices);
-    ClassDB::bind_method(D_METHOD("set_goal_available_ratio", "goal_available_ratio"), &SFPlayer::set_goal_available_ratio);
-    ClassDB::bind_method(D_METHOD("get_goal_available_ratio"), &SFPlayer::get_goal_available_ratio);
+void SoundFontPlayer::_bind_methods() {
+    ClassDB::bind_method(D_METHOD("set_soundfont", "soundfont"), &SoundFontPlayer::set_soundfont);
+    ClassDB::bind_method(D_METHOD("get_soundfont"), &SoundFontPlayer::get_soundfont);
+    ClassDB::bind_method(D_METHOD("set_gain", "gain"), &SoundFontPlayer::set_gain);
+    ClassDB::bind_method(D_METHOD("get_gain"), &SoundFontPlayer::get_gain);
+    ClassDB::bind_method(D_METHOD("set_max_voices", "max_voices"), &SoundFontPlayer::set_max_voices);
+    ClassDB::bind_method(D_METHOD("get_max_voices"), &SoundFontPlayer::get_max_voices);
+    ClassDB::bind_method(D_METHOD("set_goal_available_ratio", "goal_available_ratio"), &SoundFontPlayer::set_goal_available_ratio);
+    ClassDB::bind_method(D_METHOD("get_goal_available_ratio"), &SoundFontPlayer::get_goal_available_ratio);
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "soundfont", PROPERTY_HINT_RESOURCE_TYPE, "SoundFont"), "set_soundfont", "get_soundfont");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "gain", PROPERTY_HINT_RANGE, "-48.0,12.0,0.1,suffix:dB"), "set_gain", "get_gain");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_voices", PROPERTY_HINT_RANGE, "1,256,1"), "set_max_voices", "get_max_voices");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "goal_available_ratio", PROPERTY_HINT_RANGE, "0.0,1.0,0.01"), "set_goal_available_ratio", "get_goal_available_ratio");
-    ClassDB::bind_method(D_METHOD("get_presetindex", "bank", "preset_number"), &SFPlayer::get_presetindex);
-    ClassDB::bind_method(D_METHOD("get_presetcount"), &SFPlayer::get_presetcount);
-    ClassDB::bind_method(D_METHOD("get_presetname", "preset_index"), &SFPlayer::get_presetname);
-    ClassDB::bind_method(D_METHOD("bank_get_presetname", "bank", "preset_number"), &SFPlayer::bank_get_presetname);
-    ClassDB::bind_method(D_METHOD("note_on", "preset_index", "key", "velocity"), &SFPlayer::note_on);
-    ClassDB::bind_method(D_METHOD("bank_note_on", "bank", "preset_number", "key", "velocity"), &SFPlayer::bank_note_on);
-    ClassDB::bind_method(D_METHOD("note_off", "preset_index", "key"), &SFPlayer::note_off);
-    ClassDB::bind_method(D_METHOD("bank_note_off", "bank", "preset_number", "key"), &SFPlayer::bank_note_off);
-    ClassDB::bind_method(D_METHOD("physics_process"), &SFPlayer::_physics_process);
+    ClassDB::bind_method(D_METHOD("get_presetindex", "bank", "preset_number"), &SoundFontPlayer::get_presetindex);
+    ClassDB::bind_method(D_METHOD("get_presetcount"), &SoundFontPlayer::get_presetcount);
+    ClassDB::bind_method(D_METHOD("get_presetname", "preset_index"), &SoundFontPlayer::get_presetname);
+    ClassDB::bind_method(D_METHOD("bank_get_presetname", "bank", "preset_number"), &SoundFontPlayer::bank_get_presetname);
+    ClassDB::bind_method(D_METHOD("note_on", "preset_index", "key", "velocity"), &SoundFontPlayer::note_on);
+    ClassDB::bind_method(D_METHOD("bank_note_on", "bank", "preset_number", "key", "velocity"), &SoundFontPlayer::bank_note_on);
+    ClassDB::bind_method(D_METHOD("note_off", "preset_index", "key"), &SoundFontPlayer::note_off);
+    ClassDB::bind_method(D_METHOD("bank_note_off", "bank", "preset_number", "key"), &SoundFontPlayer::bank_note_off);
+    ClassDB::bind_method(D_METHOD("physics_process"), &SoundFontPlayer::_physics_process);
 }
