@@ -38,12 +38,14 @@ class SFPlayer : public AudioStreamPlayer {
     GDCLASS(SFPlayer, AudioStreamPlayer)
 
 private:
-    Ref<AudioStreamGenerator> genstream;
     Ref<SoundFont> soundfont;
     tsf * generator;
     float gain;
     int max_voices;
     bool prefilled;
+    double time;
+    float goal_available_ratio;
+    int max_samples_available;
 
 protected:
     static void _bind_methods();
@@ -61,6 +63,8 @@ public:
     float get_gain() const;
     void set_max_voices(int max_voices);
     int get_max_voices() const;
+    void set_goal_available_ratio(float goal_available_ratio);
+    float get_goal_available_ratio() const;
 
     int get_presetindex(int bank, int preset_number) const;
     int get_presetcount() const;

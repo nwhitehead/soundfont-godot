@@ -29,6 +29,7 @@ PackedByteArray SoundFont::get_data() const {
 }
 
 SFPlayer::SFPlayer() {
+    Ref<AudioStreamGenerator> genstream;
     genstream.instantiate();
     // Set reasonable snappy default latency
     genstream->set_buffer_length(0.05 /* seconds */);
@@ -40,11 +41,13 @@ SFPlayer::SFPlayer() {
     max_voices = 32;
     set_autoplay(true);
     prefilled = false;
+    time = 0.0;
+    goal_available_ratio = 1.0f;
+    max_samples_available = 0;
 }
 
 SFPlayer::~SFPlayer() {
     set_stream(nullptr);
-    genstream.unref();
     if (generator) {
         tsf_close(generator);
         generator = nullptr;
@@ -52,8 +55,9 @@ SFPlayer::~SFPlayer() {
 }
 
 void SFPlayer::setup_generator() {
-    if (generator && genstream.is_valid()) {
-        int mix_rate = genstream->get_mix_rate();
+    Ref<AudioStreamGenerator> stream = get_stream();
+    if (generator && stream.is_valid()) {
+        int mix_rate = stream->get_mix_rate();
         tsf_set_output(generator, TSF_STEREO_INTERLEAVED, mix_rate, gain);
         tsf_set_max_voices(generator, std::max(max_voices, 1));
     }
@@ -64,8 +68,9 @@ void SFPlayer::_process(double delta) {
         // In editor, don't play SoundFont audio data
         return;
     }
-    if (!genstream.is_valid()) {
-        // stream needs to be valid to generate anything
+    Ref<AudioStreamGenerator> stream = get_stream();
+    if (!stream.is_valid()) {
+        // stream needs to be valid AudioStreamGenerator to generate anything
         return;
     }
     Ref<AudioStreamGeneratorPlayback> playback = get_stream_playback();
@@ -75,17 +80,31 @@ void SFPlayer::_process(double delta) {
     }
     if (!prefilled) {
         // On first call, prefill buffers as much as possible to avoid glitches on first load
-        delta = 1.0;
+//        delta = 1.0;
         prefilled = true;
     }
+    float mix_rate = stream->get_mix_rate();
+    float buffer_length = stream->get_buffer_length();
     int available = playback->get_frames_available();
-    int samples = std::min(static_cast<int>(delta * genstream->get_mix_rate()), available);
+    max_samples_available = std::max(max_samples_available, available);
+    int goal_available = static_cast<int>(max_samples_available * goal_available_ratio);
+    // If buffer is almost full, never overfill (cut down samples with min)
+    int samples = 0;
+    // If buffer is too empty, use large samples to help fill it up
+    // Otherwise use small samples to let it drain
+    if (available > goal_available) {
+        int large_samples = static_cast<int>(delta * mix_rate * 1.01f);
+        samples = std::min(large_samples, available);
+    } else {
+        int small_samples = static_cast<int>(delta * mix_rate * 0.99f);
+        samples = std::min(small_samples, available);
+    }
     if (!samples) {
         // Nothing to render
         return;
     }
     playback->push_buffer(render(samples));
-    // UtilityFunctions::print("SFPlayer _process delta=", delta, " samples=", samples, " available=", available);
+    UtilityFunctions::print("SFPlayer _process delta=", delta, " samples=", samples, " available=", available);
 }
 
 void SFPlayer::set_soundfont(Ref<SoundFont> p_soundfont) {
@@ -127,6 +146,15 @@ void SFPlayer::set_max_voices(int p_max_voices) {
 int SFPlayer::get_max_voices() const {
     return max_voices;
 }
+
+void SFPlayer::set_goal_available_ratio(float p_goal_available_ratio) {
+    goal_available_ratio = p_goal_available_ratio;
+}
+
+float SFPlayer::get_goal_available_ratio() const {
+    return goal_available_ratio;
+}
+
 
 int SFPlayer::get_presetindex(int bank, int preset_number) const {
     if (!generator) {
@@ -217,9 +245,12 @@ void SFPlayer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_gain"), &SFPlayer::get_gain);
     ClassDB::bind_method(D_METHOD("set_max_voices", "max_voices"), &SFPlayer::set_max_voices);
     ClassDB::bind_method(D_METHOD("get_max_voices"), &SFPlayer::get_max_voices);
+    ClassDB::bind_method(D_METHOD("set_goal_available_ratio", "goal_available_ratio"), &SFPlayer::set_goal_available_ratio);
+    ClassDB::bind_method(D_METHOD("get_goal_available_ratio"), &SFPlayer::get_goal_available_ratio);
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "soundfont", PROPERTY_HINT_RESOURCE_TYPE, "SoundFont"), "set_soundfont", "get_soundfont");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "gain", PROPERTY_HINT_RANGE, "-48.0,12.0,0.1,suffix:dB"), "set_gain", "get_gain");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_voices", PROPERTY_HINT_RANGE, "1,256,1"), "set_max_voices", "get_max_voices");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "goal_available_ratio", PROPERTY_HINT_RANGE, "0.0,1.0,0.01"), "set_goal_available_ratio", "get_goal_available_ratio");
     ClassDB::bind_method(D_METHOD("get_presetindex", "bank", "preset_number"), &SFPlayer::get_presetindex);
     ClassDB::bind_method(D_METHOD("get_presetcount"), &SFPlayer::get_presetcount);
     ClassDB::bind_method(D_METHOD("get_presetname", "preset_index"), &SFPlayer::get_presetname);
@@ -229,5 +260,4 @@ void SFPlayer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("note_off", "preset_index", "key"), &SFPlayer::note_off);
     ClassDB::bind_method(D_METHOD("bank_note_off", "bank", "preset_number", "key"), &SFPlayer::bank_note_off);
     ClassDB::bind_method(D_METHOD("process", "delta"), &SFPlayer::_process);
-
 }
