@@ -1,11 +1,13 @@
-cmake_minimum_required(VERSION 3.19)
-project(soundfont-godot)
+cmake_minimum_required( VERSION 3.19 )
+project( soundfont-godot )
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set( CMAKE_CXX_STANDARD 17 )
+set( CMAKE_CXX_STANDARD_REQUIRED ON )
+set( CMAKE_POSITION_INDEPENDENT_CODE ON )
 
-include(FetchContent)
+set( CMAKE_BUILD_TYPE Release )
+
+include( FetchContent )
 
 FetchContent_Declare(
         GDExtension
@@ -13,17 +15,61 @@ FetchContent_Declare(
         GIT_TAG 4.2
 )
 
-FetchContent_MakeAvailable(GDExtension)
+FetchContent_MakeAvailable( GDExtension )
 
-project(soundfont-gdextension)
+project( soundfont-gdextension )
 
-file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
-
-add_library(${PROJECT_NAME} SHARED ${SOURCES})
+add_library(${PROJECT_NAME} SHARED)
 
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 target_link_libraries(${PROJECT_NAME} PUBLIC godot::cpp)
+target_compile_features( ${PROJECT_NAME}
+    PRIVATE
+        cxx_std_17
+)
 
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX src FILES ${SOURCES})
+# LIB_ARCH is the architecture being built. It is set to the build system's architecture.
+# For macOS, we build a universal library (both arm64 and x86_64).
+set( LIB_ARCH ${CMAKE_SYSTEM_PROCESSOR} )
+if ( APPLE )
+    set( LIB_ARCH "universal" )
+endif()
+
+# LIB_DIR is where the actual library ends up. This is used in both the build directory and the
+# install directory and needs to be consistent with the paths in the gdextension file.
+#   e.g. linux.release.x86_64 = "lib/Linux-x86_64/libGDExtensionTemplate.so"
+set( LIB_DIR "lib/${CMAKE_SYSTEM_NAME}-${LIB_ARCH}" )
+
+message( STATUS "Building ${PROJECT_NAME} for ${LIB_ARCH} on ${CMAKE_SYSTEM_NAME}")
+
+set( BUILD_OUTPUT_DIR "${PROJECT_BINARY_DIR}/${PROJECT_NAME}/" )
+
+set_target_properties( ${PROJECT_NAME}
+    PROPERTIES
+        CXX_VISIBILITY_PRESET hidden
+        VISIBILITY_INLINES_HIDDEN true
+        RUNTIME_OUTPUT_DIRECTORY "${BUILD_OUTPUT_DIR}/${LIB_DIR}"
+        LIBRARY_OUTPUT_DIRECTORY "${BUILD_OUTPUT_DIR}/${LIB_DIR}"
+)
+
+if( NOT DEFINED CMAKE_DEBUG_POSTFIX )
+    set_target_properties( ${PROJECT_NAME}
+        PROPERTIES
+            DEBUG_POSTFIX "-d"
+    )
+endif()
+
+# Copy over icons
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_SOURCE_DIR}/icons"
+            ${BUILD_OUTPUT_DIR}/icons
+)
+
+add_subdirectory( src )
+
+# Install library, extension file, and support files in ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}
+set( INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}/" )
+
+add_subdirectory( templates )
