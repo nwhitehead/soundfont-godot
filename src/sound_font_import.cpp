@@ -41,7 +41,7 @@ int SoundFontImportPlugin::_get_import_order() {
 }
 
 String SoundFontImportPlugin::_get_save_extension() const {
-    return "tres";
+    return "res";
 }
 
 TypedArray<Dictionary> SoundFontImportPlugin::_get_import_options(const String &path, int32_t preset_index) {
