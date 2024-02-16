@@ -10,7 +10,7 @@ include( FetchContent )
 FetchContent_Declare(
         GDExtension
         GIT_REPOSITORY https://github.com/godotengine/godot-cpp.git
-        GIT_TAG 4.2
+        GIT_TAG 4.1
 )
 
 FetchContent_MakeAvailable( GDExtension )
