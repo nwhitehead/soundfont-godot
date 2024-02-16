@@ -76,7 +76,7 @@ add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${BUILD_OUTPUT_DIR}"
-            "${PROJECT_BINARY_DIR}/demo/${PROJECT_NAME}"
+            "${PROJECT_BINARY_DIR}/demo/addons/${PROJECT_NAME}"
 )
 
 add_subdirectory( src )

@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://dfhsqj7og2fgr"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_526j8"]
-[ext_resource type="SoundFont" uid="uid://dqv1fgei11yfv" path="res://example.sf2" id="2_xg276"]
+[ext_resource type="SoundFont" uid="uid://bw3y65shd3ae4" path="res://example.sf2" id="2_xg276"]
 
 [sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_ckiyt"]
 buffer_length = 0.1
@@ -12,3 +12,12 @@ script = ExtResource("1_526j8")
 [node name="SoundFontPlayer" type="SoundFontPlayer" parent="."]
 soundfont = ExtResource("2_xg276")
 stream = SubResource("AudioStreamGenerator_ckiyt")
+
+[node name="TextEdit" type="TextEdit" parent="."]
+offset_left = 456.0
+offset_top = 267.0
+offset_right = 736.0
+offset_bottom = 370.0
+text = "Press these keys for organ:
+A S D F G H J K L"
+editable = false

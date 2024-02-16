@@ -37,7 +37,7 @@ float SoundFontImportPlugin::_get_priority() {
 }
 
 int SoundFontImportPlugin::_get_import_order() {
-    return 2;
+    return 0;
 }
 
 String SoundFontImportPlugin::_get_save_extension() const {

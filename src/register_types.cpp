@@ -11,15 +11,15 @@
 using namespace godot;
 
 void initialize_module(ModuleInitializationLevel p_level) {
-    if (p_level != MODULE_INITIALIZATION_LEVEL_EDITOR) {
-        return;
+    if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
+        ClassDB::register_class<SoundFont>();
+        ClassDB::register_class<SoundFontPlayer>();
     }
-
-    ClassDB::register_class<SoundFont>();
-    ClassDB::register_class<SoundFontPlayer>();
-    ClassDB::register_class<SoundFontImportPlugin>();
-    ClassDB::register_class<SoundFontPlugin>();
-    EditorPlugins::add_by_type<SoundFontPlugin>();
+    if (p_level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
+        ClassDB::register_class<SoundFontImportPlugin>();
+        ClassDB::register_class<SoundFontPlugin>();
+        EditorPlugins::add_by_type<SoundFontPlugin>();
+    }
 }
 
 extern "C" {
@@ -30,7 +30,7 @@ GDExtensionBool GDE_EXPORT library_init(GDExtensionInterfaceGetProcAddress p_get
     godot::GDExtensionBinding::InitObject init_obj(p_get_proc_address, p_library, r_initialization);
 
     init_obj.register_initializer(initialize_module);
-    init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_EDITOR);
+    init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_SCENE);
 
     return init_obj.init();
 }
