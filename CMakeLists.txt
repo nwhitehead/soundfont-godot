@@ -65,6 +65,20 @@ add_custom_command(
             ${BUILD_OUTPUT_DIR}/icons
 )
 
+# Copy demo project
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_SOURCE_DIR}/demo"
+            "${PROJECT_BINARY_DIR}/demo"
+)
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${BUILD_OUTPUT_DIR}"
+            "${PROJECT_BINARY_DIR}/demo/${PROJECT_NAME}"
+)
+
 add_subdirectory( src )
 
 # Install library, extension file, and support files in ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}

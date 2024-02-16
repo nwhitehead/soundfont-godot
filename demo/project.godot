@@ -13,11 +13,6 @@ config_version=5
 config/name="Projects"
 run/main_scene="res://main.tscn"
 config/features=PackedStringArray("4.2", "Mobile")
-boot_splash/show_image=false
-
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/my_plugin/plugin.cfg")
 
 [input]
 
