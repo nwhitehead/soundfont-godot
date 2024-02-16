@@ -1,12 +1,12 @@
 
-#include "soundfont.h"
-
 #include <gdextension_interface.h>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
 
-#include "importer.h"
+#include "sound_font.h"
+#include "sound_font_player.h"
+#include "sound_font_import.h"
 
 using namespace godot;
 
