@@ -1,24 +1,14 @@
 extends Node2D
 
-#var sfg: SoundFontGenerator = null
-#var playback: AudioStreamPlayback = null
-# 42 # cello
-# 58 # tuba
 var preset: int = 0
 var player: SoundFontPlayer = null
+var base_note: int = 44
 
 func _ready():
 	player = $SoundFontPlayer
-	print(player.get_playback_position())
-	print(player.get_stream().get_buffer_length())
-	print(AudioServer.get_time_to_next_mix())
-	print(player.get_presetname(0))
-	#player.note_on(0, 44, 1.0)
+	print("sf2 preset: ", player.get_presetname(preset))
 
 func _input(event):
-	#var playback:AudioStreamGeneratorPlayback = player.get_stream_playback();
-	#var pos = player.get_playback_position()
-	#print(pos, " ", AudioServer.get_time_to_next_mix(), " ", AudioServer.get_output_latency())
 	var notes = {
 		"note_c": 0,
 		"note_d": 2,
@@ -32,6 +22,6 @@ func _input(event):
 	}
 	for note in notes:
 		if event.is_action_pressed(note):
-			player.note_on(preset, 44 + notes[note], 1.0)
+			player.note_on(preset, base_note + notes[note], 1.0)
 		if event.is_action_released(note):
-			player.note_off(preset, 44 + notes[note])
+			player.note_off(preset, base_note + notes[note])

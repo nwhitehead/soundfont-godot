@@ -113,13 +113,10 @@ void SoundFontPlayer::set_soundfont(Ref<SoundFont> p_soundfont) {
     }
     soundfont = p_soundfont;
     if (soundfont.is_valid() && soundfont->get_data().size()) {
-        UtilityFunctions::print("SoundFontPlayer set_soundfont called, size=", soundfont->get_data().size());
         generator = tsf_load_memory(soundfont->get_data().ptr(), soundfont->get_data().size());
         if (!generator) {
             UtilityFunctions::printerr("Error parsing SF2 resource inside SoundFontPlayer");
         }
-    } else {
-        UtilityFunctions::print("SoundFontPlayer set_soundfont called (empty soundfont)");
     }
     setup_generator();
 }
@@ -170,7 +167,7 @@ int SoundFontPlayer::get_presetcount() const {
 
 String SoundFontPlayer::get_presetname(int preset_index) const {
     if (!generator) {
-        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontPlayer");
+        UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
         return String("");
     }
     return String(tsf_get_presetname(generator, preset_index));
@@ -178,7 +175,7 @@ String SoundFontPlayer::get_presetname(int preset_index) const {
 
 String SoundFontPlayer::bank_get_presetname(int bank, int preset_number) const {
     if (!generator) {
-        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontPlayer");
+        UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
         return String("");
     }
     return String(tsf_bank_get_presetname(generator, bank, preset_number));
@@ -186,7 +183,7 @@ String SoundFontPlayer::bank_get_presetname(int bank, int preset_number) const {
 
 void SoundFontPlayer::note_on(int preset_index, int key, float velocity) {
     if (!generator) {
-        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontPlayer");
+        UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
         return;
     }
     if (!tsf_note_on(generator, preset_index, key, velocity)) {
@@ -197,7 +194,7 @@ void SoundFontPlayer::note_on(int preset_index, int key, float velocity) {
 
 void SoundFontPlayer::bank_note_on(int bank, int preset_number, int key, float velocity) {
     if (!generator) {
-        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontPlayer");
+        UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
         return;
     }
     if (!tsf_bank_note_on(generator, bank, preset_number, key, velocity)) {
@@ -208,7 +205,7 @@ void SoundFontPlayer::bank_note_on(int bank, int preset_number, int key, float v
 
 void SoundFontPlayer::note_off(int preset_index, int key) {
     if (!generator) {
-        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontPlayer");
+        UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
         return;
     }
     tsf_note_off(generator, preset_index, key);
@@ -216,7 +213,7 @@ void SoundFontPlayer::note_off(int preset_index, int key) {
 
 void SoundFontPlayer::bank_note_off(int bank, int preset_number, int key) {
     if (!generator) {
-        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontPlayer");
+        UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
         return;
     }
     if (!tsf_bank_note_off(generator, bank, preset_number, key)) {
@@ -228,7 +225,7 @@ void SoundFontPlayer::bank_note_off(int bank, int preset_number, int key) {
 PackedVector2Array SoundFontPlayer::render(int samples) {
     PackedVector2Array result{};
     if (!generator) {
-        UtilityFunctions::printerr("No SoundFont generator loaded in SoundFontPlayer");
+        UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
         return result;
     }
     result.resize(samples);
