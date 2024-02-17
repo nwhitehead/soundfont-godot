@@ -4,6 +4,7 @@ project( soundfont-godot )
 set( CMAKE_CXX_STANDARD 17 )
 set( CMAKE_CXX_STANDARD_REQUIRED ON )
 set( CMAKE_POSITION_INDEPENDENT_CODE ON )
+set( LIB_ARCH ${CMAKE_SYSTEM_PROCESSOR} )
 
 include( FetchContent )
 
@@ -20,7 +21,15 @@ project( soundfont-gdextension )
 add_library(${PROJECT_NAME} SHARED)
 
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
-target_link_libraries(${PROJECT_NAME} PUBLIC godot::cpp)
+
+if ( "${CMAKE_SYSTEM_NAME}" MATCHES "Windows" )
+    message( STATUS "In windows" )
+    set ( LIB_ARCH "AMD64" )
+    target_link_libraries(${PROJECT_NAME} PUBLIC -static-libgcc -static-libstdc++ godot::cpp) 
+else()
+    target_link_libraries(${PROJECT_NAME} PUBLIC godot::cpp)
+endif()
+
 target_compile_features( ${PROJECT_NAME}
     PRIVATE
         cxx_std_17
@@ -28,7 +37,6 @@ target_compile_features( ${PROJECT_NAME}
 
 # LIB_ARCH is the architecture being built. It is set to the build system's architecture.
 # For macOS, we build a universal library (both arm64 and x86_64).
-set( LIB_ARCH ${CMAKE_SYSTEM_PROCESSOR} )
 if ( APPLE )
     set( LIB_ARCH "universal" )
 endif()
