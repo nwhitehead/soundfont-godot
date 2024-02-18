@@ -52,6 +52,7 @@ public:
     int get_presetindex(int bank, int preset_number);
     int get_presetcount();
     String get_presetname(int preset_index);
+    int get_active_voice_count();
 
     void note_on(double time, int preset_index, int key, float velocity);
     void note_off(double time, int preset_index, int key);

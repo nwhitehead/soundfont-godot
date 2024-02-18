@@ -10,12 +10,13 @@ class Event {
 public:
     double time;
     EventType event_type;
+    int channel;
     int preset_index;
     int key;
     float velocity;
 
     Event();
-    Event(double time, EventType event_type, int preset_index, int key, float velocity);
+    Event(double time, EventType event_type, int channel, int preset_index, int key, float velocity);
 };
 
 #endif

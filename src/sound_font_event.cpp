@@ -9,9 +9,10 @@ Event::Event() {
     velocity = 0.0f;
 }
 
-Event::Event(double p_time, EventType p_event_type, int p_preset_index, int p_key, float p_velocity) {
+Event::Event(double p_time, EventType p_event_type, int p_channel, int p_preset_index, int p_key, float p_velocity) {
     time = p_time;
     event_type = p_event_type;
+    channel = p_channel;
     preset_index = p_preset_index;
     key = p_key;
     velocity = p_velocity;

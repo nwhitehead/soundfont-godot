@@ -94,6 +94,10 @@ float SoundFontPlayer::get_goal_available_ratio() {
     return goal_available_ratio;
 }
 
+double SoundFontPlayer::get_time() {
+    return time;
+}
+
 int SoundFontPlayer::get_presetindex(int bank, int preset_number) {
     if (!generator) {
         return -1;
@@ -116,31 +120,23 @@ String SoundFontPlayer::get_presetname(int preset_index) {
     return String(tsf_get_presetname(generator, preset_index));
 }
 
-PackedVector2Array SoundFontPlayer::render(int samples) {
-    PackedVector2Array result{};
+int SoundFontPlayer::get_active_voice_count() {
     if (!generator) {
-        UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
-        return result;
+        return -1;
     }
-    result.resize(samples);
-    tsf_render_float(generator, reinterpret_cast<float*>(result.ptrw()), samples);
-    return result;
-}
-
-double SoundFontPlayer::get_time() {
-    return time;
+    return tsf_active_voice_count(generator);
 }
 
 void SoundFontPlayer::note_off(double time, int preset_index, int key) {
-    events.push_back(Event(time, EventType::NOTE_OFF, preset_index, key, 0.0f));
+    events.push_back(Event(time, EventType::NOTE_OFF, -1, preset_index, key, 0.0f));
 }
 
 void SoundFontPlayer::note_on(double time, int preset_index, int key, float velocity) {
-    events.push_back(Event(time, EventType::NOTE_ON, preset_index, key, velocity));
+    events.push_back(Event(time, EventType::NOTE_ON, -1, preset_index, key, velocity));
 }
 
 void SoundFontPlayer::note_off_all(double time) {
-    events.push_back(Event(time, EventType::NOTE_OFF_ALL, 0, 0, 0.0f));
+    events.push_back(Event(time, EventType::NOTE_OFF_ALL, -1, 0, 0, 0.0f));
 }
 
 void SoundFontPlayer::do_event(const Event &event) {
@@ -159,6 +155,17 @@ void SoundFontPlayer::do_event(const Event &event) {
             tsf_note_off_all(generator);
             break;
     }
+}
+
+PackedVector2Array SoundFontPlayer::render(int samples) {
+    PackedVector2Array result{};
+    if (!generator) {
+        UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
+        return result;
+    }
+    result.resize(samples);
+    tsf_render_float(generator, reinterpret_cast<float*>(result.ptrw()), samples);
+    return result;
 }
 
 void SoundFontPlayer::_physics_process() {
@@ -258,6 +265,7 @@ void SoundFontPlayer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_presetindex", "bank", "preset_number"), &SoundFontPlayer::get_presetindex);
     ClassDB::bind_method(D_METHOD("get_presetcount"), &SoundFontPlayer::get_presetcount);
     ClassDB::bind_method(D_METHOD("get_presetname", "preset_index"), &SoundFontPlayer::get_presetname);
+    ClassDB::bind_method(D_METHOD("get_active_voice_count"), &SoundFontPlayer::get_active_voice_count);
     ClassDB::bind_method(D_METHOD("note_on", "time", "preset_index", "key", "velocity"), &SoundFontPlayer::note_on);
     ClassDB::bind_method(D_METHOD("note_off", "time", "preset_index", "key"), &SoundFontPlayer::note_off);
     ClassDB::bind_method(D_METHOD("note_off_all", "time"), &SoundFontPlayer::note_off_all);
