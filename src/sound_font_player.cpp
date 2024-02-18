@@ -48,48 +48,6 @@ void SoundFontPlayer::setup_generator() {
     }
 }
 
-void SoundFontPlayer::_physics_process() {
-    double delta = 1.0/60.0;
-    if (Engine::get_singleton()->is_editor_hint()) {
-        // In editor, don't play SoundFont audio data
-        // Also reset max_samples_available in case buffer settings modified
-        max_samples_available = 0;
-        return;
-    }
-    Ref<AudioStreamGenerator> stream = get_stream();
-    if (!stream.is_valid()) {
-        // stream needs to be valid AudioStreamGenerator to generate anything
-        max_samples_available = 0;
-        return;
-    }
-    Ref<AudioStreamGeneratorPlayback> playback = get_stream_playback();
-    if (!playback.is_valid()) {
-        // If there is no playback, stop
-        max_samples_available = 0;
-        return;
-    }
-    float mix_rate = stream->get_mix_rate();
-    float buffer_length = stream->get_buffer_length();
-    int available = playback->get_frames_available();
-    // Just set max_samples_available on first call
-    if (max_samples_available == 0) {
-        max_samples_available = std::max(max_samples_available, available);
-    }
-    int goal_available = static_cast<int>(max_samples_available * goal_available_ratio);
-    int ideal_samples = static_cast<int>(delta * mix_rate);
-    // If buffer is too empty, use large samples to help fill it up
-    // Otherwise use small samples to let it drain
-    // Push number of samples to correct part of gap to goal_available
-    int samples = ideal_samples + (available - goal_available) / 32;
-    // If buffer is almost full, never overfill (cut down samples with min)
-    samples = std::max(std::min(samples, available), 0);
-    if (!samples) {
-        // Nothing to render
-        return;
-    }
-    playback->push_buffer(render(samples));
-}
-
 void SoundFontPlayer::set_soundfont(Ref<SoundFont> p_soundfont) {
     if (generator) {
         tsf_close(generator);
@@ -176,6 +134,14 @@ void SoundFontPlayer::note_off(int preset_index, int key) {
     tsf_note_off(generator, preset_index, key);
 }
 
+void SoundFontPlayer::note_off_all() {
+    if (!generator) {
+        UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
+        return;
+    }
+    tsf_note_off_all(generator);
+}
+
 PackedVector2Array SoundFontPlayer::render(int samples) {
     PackedVector2Array result{};
     if (!generator) {
@@ -189,6 +155,49 @@ PackedVector2Array SoundFontPlayer::render(int samples) {
 
 double SoundFontPlayer::get_time() const {
     return time;
+}
+
+void SoundFontPlayer::_physics_process() {
+    double delta = 1.0/60.0;
+    time += delta;
+    if (Engine::get_singleton()->is_editor_hint()) {
+        // In editor, don't play SoundFont audio data
+        // Also reset max_samples_available in case buffer settings modified
+        max_samples_available = 0;
+        return;
+    }
+    Ref<AudioStreamGenerator> stream = get_stream();
+    if (!stream.is_valid()) {
+        // stream needs to be valid AudioStreamGenerator to generate anything
+        max_samples_available = 0;
+        return;
+    }
+    Ref<AudioStreamGeneratorPlayback> playback = get_stream_playback();
+    if (!playback.is_valid()) {
+        // If there is no playback, stop
+        max_samples_available = 0;
+        return;
+    }
+    float mix_rate = stream->get_mix_rate();
+    float buffer_length = stream->get_buffer_length();
+    int available = playback->get_frames_available();
+    // Just set max_samples_available on first call
+    if (max_samples_available == 0) {
+        max_samples_available = std::max(max_samples_available, available);
+    }
+    int goal_available = static_cast<int>(max_samples_available * goal_available_ratio);
+    int ideal_samples = static_cast<int>(delta * mix_rate);
+    // If buffer is too empty, use large samples to help fill it up
+    // Otherwise use small samples to let it drain
+    // Push number of samples to correct part of gap to goal_available
+    int samples = ideal_samples + (available - goal_available) / 32;
+    // If buffer is almost full, never overfill (cut down samples with min)
+    samples = std::max(std::min(samples, available), 0);
+    if (!samples) {
+        // Nothing to render
+        return;
+    }
+    playback->push_buffer(render(samples));
 }
 
 void SoundFontPlayer::_bind_methods() {
@@ -209,6 +218,7 @@ void SoundFontPlayer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_presetname", "preset_index"), &SoundFontPlayer::get_presetname);
     ClassDB::bind_method(D_METHOD("note_on", "preset_index", "key", "velocity"), &SoundFontPlayer::note_on);
     ClassDB::bind_method(D_METHOD("note_off", "preset_index", "key"), &SoundFontPlayer::note_off);
+    ClassDB::bind_method(D_METHOD("note_off_all"), &SoundFontPlayer::note_off_all);
     ClassDB::bind_method(D_METHOD("get_time"), &SoundFontPlayer::get_time);
     ClassDB::bind_method(D_METHOD("physics_process"), &SoundFontPlayer::_physics_process);
 }

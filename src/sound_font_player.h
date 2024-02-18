@@ -47,6 +47,7 @@ public:
     String get_presetname(int preset_index) const;
     void note_on(int preset_index, int key, float velocity);
     void note_off(int preset_index, int key);
+    void note_off_all();
 
     double get_time() const;
 

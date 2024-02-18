@@ -21,3 +21,25 @@ offset_bottom = 370.0
 text = "Press these keys for organ:
 A S D F G H J K L"
 editable = false
+
+[node name="ArpTimer" type="Timer" parent="."]
+wait_time = 0.15
+autostart = true
+
+[node name="ButtonG" type="Button" parent="."]
+offset_left = 142.0
+offset_top = 204.0
+offset_right = 203.0
+offset_bottom = 247.0
+text = "G"
+
+[node name="ButtonC" type="Button" parent="."]
+offset_left = 142.0
+offset_top = 153.0
+offset_right = 204.0
+offset_bottom = 192.0
+text = "C"
+
+[connection signal="timeout" from="ArpTimer" to="." method="_on_arp_timer_timeout"]
+[connection signal="button_down" from="ButtonG" to="." method="_on_button_button_down_g"]
+[connection signal="button_down" from="ButtonC" to="." method="_on_button_button_down_c"]
