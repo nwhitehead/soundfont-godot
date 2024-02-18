@@ -58,6 +58,11 @@ public:
     void note_off(double time, int preset_index, int key);
     void note_off_all(double time);
 
+    void channel_set_presetindex(double time, int channel, int preset_index);
+    void channel_set_presetnumber(double time, int channel, int preset_number, bool drums);
+    void channel_set_bank(double time, int channel, int bank);
+    void channel_set_pan(double time, int channel, float pan);
+
     void _physics_process();
 };
 

@@ -9,6 +9,7 @@ Event::Event(double p_time, EventType p_event_type) {
     preset_index = -1;
     key = -1;
     velocity = 0.0f;
+    drums = false;
 }
 
 Event::Event() {

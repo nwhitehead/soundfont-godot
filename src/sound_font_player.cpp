@@ -146,6 +146,35 @@ void SoundFontPlayer::note_off_all(double time) {
     events.push_back(Event(time, EventType::NOTE_OFF_ALL));
 }
 
+void SoundFontPlayer::channel_set_presetindex(double time, int channel, int preset_index) {
+    Event evt(time, EventType::SET_PRESETINDEX);
+    evt.channel = channel;
+    evt.preset_index = preset_index;
+    events.push_back(evt);
+}
+
+void SoundFontPlayer::channel_set_presetnumber(double time, int channel, int preset_number, bool drums) {
+    Event evt(time, EventType::SET_PRESETNUMBER);
+    evt.channel = channel;
+    evt.preset_index = preset_number;
+    evt.drums = drums;
+    events.push_back(evt);
+}
+
+void SoundFontPlayer::channel_set_bank(double time, int channel, int bank) {
+    Event evt(time, EventType::SET_BANK);
+    evt.channel = channel;
+    evt.bank = bank;
+    events.push_back(evt);
+}
+
+void SoundFontPlayer::channel_set_pan(double time, int channel, float pan) {
+    Event evt(time, EventType::SET_PAN);
+    evt.channel = channel;
+    evt.velocity = pan;
+    events.push_back(evt);
+}
+
 void SoundFontPlayer::do_event(const Event &event) {
     if (!generator) {
         UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
@@ -276,5 +305,11 @@ void SoundFontPlayer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("note_on", "time", "preset_index", "key", "velocity"), &SoundFontPlayer::note_on);
     ClassDB::bind_method(D_METHOD("note_off", "time", "preset_index", "key"), &SoundFontPlayer::note_off);
     ClassDB::bind_method(D_METHOD("note_off_all", "time"), &SoundFontPlayer::note_off_all);
+
+    ClassDB::bind_method(D_METHOD("channel_set_presetindex", "time", "channel", "preset_index"), &SoundFontPlayer::channel_set_presetindex);
+    ClassDB::bind_method(D_METHOD("channel_set_presetnumber", "time", "channel", "preset_number", "drums"), &SoundFontPlayer::channel_set_presetnumber);
+    ClassDB::bind_method(D_METHOD("channel_set_bank", "time", "channel", "bank"), &SoundFontPlayer::channel_set_bank);
+    ClassDB::bind_method(D_METHOD("channel_set_pan", "time", "channel", "pan"), &SoundFontPlayer::channel_set_pan);
+
     ClassDB::bind_method(D_METHOD("physics_process"), &SoundFontPlayer::_physics_process);
 }

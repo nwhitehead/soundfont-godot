@@ -16,7 +16,9 @@ public:
     int bank;
     int preset_index;
     int key;
+    // velocity or other control parameter
     float velocity;
+    bool drums;
 
     Event();
     Event(double time, EventType event_type);
