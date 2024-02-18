@@ -175,6 +175,22 @@ void SoundFontPlayer::channel_set_pan(double time, int channel, float pan) {
     events.push_back(evt);
 }
 
+void SoundFontPlayer::channel_note_on(double time, int channel, int key, float velocity) {
+    Event evt(time, EventType::NOTE_ON);
+    evt.channel = channel;
+    evt.key = key;
+    evt.velocity = velocity;
+    events.push_back(evt);
+
+}
+
+void SoundFontPlayer::channel_note_off(double time, int channel, int key) {
+    Event evt(time, EventType::NOTE_OFF);
+    evt.channel = channel;
+    evt.key = key;
+    events.push_back(evt);
+}
+
 void SoundFontPlayer::do_event(const Event &event) {
     if (!generator) {
         UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
@@ -182,13 +198,33 @@ void SoundFontPlayer::do_event(const Event &event) {
     }
     switch (event.event_type) {
         case EventType::NOTE_OFF:
-            tsf_note_off(generator, event.preset_index, event.key);
+            if (event.channel == -1) {
+                tsf_note_off(generator, event.preset_index, event.key);
+            } else {
+                tsf_channel_note_off(generator, event.channel, event.key);
+            }
             break;
         case EventType::NOTE_ON:
-            tsf_note_on(generator, event.preset_index, event.key, event.velocity);
+            if (event.channel == -1) {
+                tsf_note_on(generator, event.preset_index, event.key, event.velocity);
+            } else {
+                tsf_channel_note_on(generator, event.channel, event.key, event.velocity);
+            }
             break;
         case EventType::NOTE_OFF_ALL:
             tsf_note_off_all(generator);
+            break;
+        case EventType::SET_PRESETINDEX:
+            tsf_channel_set_presetindex(generator, event.channel, event.preset_index);
+            break;
+        case EventType::SET_PRESETNUMBER:
+            tsf_channel_set_presetnumber(generator, event.channel, event.preset_index, event.drums ? 1 : 0);
+            break;
+        case EventType::SET_BANK:
+            tsf_channel_set_bank(generator, event.channel, event.bank);
+            break;
+        case EventType::SET_PAN:
+            tsf_channel_set_pan(generator, event.channel, event.velocity);
             break;
     }
 }
@@ -310,6 +346,8 @@ void SoundFontPlayer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("channel_set_presetnumber", "time", "channel", "preset_number", "drums"), &SoundFontPlayer::channel_set_presetnumber);
     ClassDB::bind_method(D_METHOD("channel_set_bank", "time", "channel", "bank"), &SoundFontPlayer::channel_set_bank);
     ClassDB::bind_method(D_METHOD("channel_set_pan", "time", "channel", "pan"), &SoundFontPlayer::channel_set_pan);
+    ClassDB::bind_method(D_METHOD("channel_note_on", "time", "channel", "key", "velocity"), &SoundFontPlayer::channel_note_on);
+    ClassDB::bind_method(D_METHOD("channel_note_off", "time", "channel", "key"), &SoundFontPlayer::channel_note_off);
 
     ClassDB::bind_method(D_METHOD("physics_process"), &SoundFontPlayer::_physics_process);
 }
