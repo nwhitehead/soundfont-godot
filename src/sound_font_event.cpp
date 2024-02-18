@@ -1,19 +1,22 @@
 
 #include "sound_font_event.h"
 
-Event::Event() {
-    time = 0.0;
-    event_type = EventType::NOTE_OFF;
-    preset_index = 0;
-    key = 0;
+Event::Event(double p_time, EventType p_event_type) {
+    time = p_time;
+    event_type = p_event_type;
+    channel = -1;
+    bank = -1;
+    preset_index = -1;
+    key = -1;
     velocity = 0.0f;
 }
 
-Event::Event(double p_time, EventType p_event_type, int p_channel, int p_preset_index, int p_key, float p_velocity) {
-    time = p_time;
-    event_type = p_event_type;
-    channel = p_channel;
-    preset_index = p_preset_index;
-    key = p_key;
-    velocity = p_velocity;
+Event::Event() {
+    time = 0.0;
+    event_type = EventType::NOTE_OFF;
+    channel = -1;
+    bank = -1;
+    preset_index = -1;
+    key = -1;
+    velocity = 0.0f;
 }

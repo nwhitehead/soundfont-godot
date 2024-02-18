@@ -128,15 +128,22 @@ int SoundFontPlayer::get_active_voice_count() {
 }
 
 void SoundFontPlayer::note_off(double time, int preset_index, int key) {
-    events.push_back(Event(time, EventType::NOTE_OFF, -1, preset_index, key, 0.0f));
+    Event evt(time, EventType::NOTE_OFF);
+    evt.preset_index = preset_index;
+    evt.key = key;
+    events.push_back(evt);
 }
 
 void SoundFontPlayer::note_on(double time, int preset_index, int key, float velocity) {
-    events.push_back(Event(time, EventType::NOTE_ON, -1, preset_index, key, velocity));
+    Event evt(time, EventType::NOTE_ON);
+    evt.preset_index = preset_index;
+    evt.key = key;
+    evt.velocity = velocity;
+    events.push_back(evt);
 }
 
 void SoundFontPlayer::note_off_all(double time) {
-    events.push_back(Event(time, EventType::NOTE_OFF_ALL, -1, 0, 0, 0.0f));
+    events.push_back(Event(time, EventType::NOTE_OFF_ALL));
 }
 
 void SoundFontPlayer::do_event(const Event &event) {
