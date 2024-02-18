@@ -32,6 +32,7 @@ protected:
     static void _bind_methods();
     PackedVector2Array render(int samples);
     void setup_generator();
+    void do_event(const Event &event);
 
 public:
     SoundFontPlayer();
@@ -47,16 +48,14 @@ public:
     void set_goal_available_ratio(float goal_available_ratio);
     float get_goal_available_ratio();
 
+    double get_time();
     int get_presetindex(int bank, int preset_number);
     int get_presetcount();
     String get_presetname(int preset_index);
-    void note_on(int preset_index, int key, float velocity);
-    void note_off(int preset_index, int key);
-    void note_off_all();
 
-    double get_time();
-    void schedule_note_off(double time, int preset_index, int key);
-    void schedule_note_on(double time, int preset_index, int key, float velocity);
+    void note_on(double time, int preset_index, int key, float velocity);
+    void note_off(double time, int preset_index, int key);
+    void note_off_all(double time);
 
     void _physics_process();
 };

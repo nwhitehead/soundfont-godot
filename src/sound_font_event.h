@@ -3,7 +3,7 @@
 #define SOUNDFONTEVENT_H
 
 enum class EventType {
-    NOTE_OFF, NOTE_ON
+    NOTE_OFF, NOTE_ON, NOTE_OFF_ALL
 };
 
 class Event {

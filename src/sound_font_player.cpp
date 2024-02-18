@@ -116,33 +116,6 @@ String SoundFontPlayer::get_presetname(int preset_index) {
     return String(tsf_get_presetname(generator, preset_index));
 }
 
-void SoundFontPlayer::note_on(int preset_index, int key, float velocity) {
-    if (!generator) {
-        UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
-        return;
-    }
-    if (!tsf_note_on(generator, preset_index, key, velocity)) {
-        UtilityFunctions::printerr("Could not allocate voice for note");
-        return;
-    }
-}
-
-void SoundFontPlayer::note_off(int preset_index, int key) {
-    if (!generator) {
-        UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
-        return;
-    }
-    tsf_note_off(generator, preset_index, key);
-}
-
-void SoundFontPlayer::note_off_all() {
-    if (!generator) {
-        UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
-        return;
-    }
-    tsf_note_off_all(generator);
-}
-
 PackedVector2Array SoundFontPlayer::render(int samples) {
     PackedVector2Array result{};
     if (!generator) {
@@ -158,12 +131,34 @@ double SoundFontPlayer::get_time() {
     return time;
 }
 
-void SoundFontPlayer::schedule_note_off(double time, int preset_index, int key) {
+void SoundFontPlayer::note_off(double time, int preset_index, int key) {
     events.push_back(Event(time, EventType::NOTE_OFF, preset_index, key, 0.0f));
 }
 
-void SoundFontPlayer::schedule_note_on(double time, int preset_index, int key, float velocity) {
+void SoundFontPlayer::note_on(double time, int preset_index, int key, float velocity) {
     events.push_back(Event(time, EventType::NOTE_ON, preset_index, key, velocity));
+}
+
+void SoundFontPlayer::note_off_all(double time) {
+    events.push_back(Event(time, EventType::NOTE_OFF_ALL, 0, 0, 0.0f));
+}
+
+void SoundFontPlayer::do_event(const Event &event) {
+    if (!generator) {
+        UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
+        return;
+    }
+    switch (event.event_type) {
+        case EventType::NOTE_OFF:
+            tsf_note_off(generator, event.preset_index, event.key);
+            break;
+        case EventType::NOTE_ON:
+            tsf_note_on(generator, event.preset_index, event.key, event.velocity);
+            break;
+        case EventType::NOTE_OFF_ALL:
+            tsf_note_off_all(generator);
+            break;
+    }
 }
 
 void SoundFontPlayer::_physics_process() {
@@ -220,16 +215,7 @@ void SoundFontPlayer::_physics_process() {
         // First look for any events that were scheduled in past and do them
         for (auto &event : events) {
             if (event.time <= time) {
-                switch (event.event_type) {
-                    case EventType::NOTE_OFF:
-                        // UtilityFunctions::print("SoundFontPlayer NOTE_OFF time=", time, " rendered_samples=", rendered_samples, " event.time=", event.time, " event.key=", event.key);
-                        note_off(event.preset_index, event.key);
-                        break;
-                    case EventType::NOTE_ON:
-                        // UtilityFunctions::print("SoundFontPlayer NOTE_ON time=", time, " rendered_samples=", rendered_samples, " event.time=", event.time, " event.key=", event.key);
-                        note_on(event.preset_index, event.key, event.velocity);
-                        break;
-                }
+                do_event(event);
             }
         }
         // Now remove events in the past
@@ -268,14 +254,12 @@ void SoundFontPlayer::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "gain", PROPERTY_HINT_RANGE, "-48.0,12.0,0.1,suffix:dB"), "set_gain", "get_gain");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_voices", PROPERTY_HINT_RANGE, "1,256,1"), "set_max_voices", "get_max_voices");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "goal_available_ratio", PROPERTY_HINT_RANGE, "0.0,1.0,0.01"), "set_goal_available_ratio", "get_goal_available_ratio");
+    ClassDB::bind_method(D_METHOD("get_time"), &SoundFontPlayer::get_time);
     ClassDB::bind_method(D_METHOD("get_presetindex", "bank", "preset_number"), &SoundFontPlayer::get_presetindex);
     ClassDB::bind_method(D_METHOD("get_presetcount"), &SoundFontPlayer::get_presetcount);
     ClassDB::bind_method(D_METHOD("get_presetname", "preset_index"), &SoundFontPlayer::get_presetname);
-    ClassDB::bind_method(D_METHOD("note_on", "preset_index", "key", "velocity"), &SoundFontPlayer::note_on);
-    ClassDB::bind_method(D_METHOD("note_off", "preset_index", "key"), &SoundFontPlayer::note_off);
-    ClassDB::bind_method(D_METHOD("note_off_all"), &SoundFontPlayer::note_off_all);
-    ClassDB::bind_method(D_METHOD("get_time"), &SoundFontPlayer::get_time);
-    ClassDB::bind_method(D_METHOD("schedule_note_off", "time", "preset_index", "key"), &SoundFontPlayer::schedule_note_off);
-    ClassDB::bind_method(D_METHOD("schedule_note_on", "time", "preset_index", "key", "velocity"), &SoundFontPlayer::schedule_note_on);
+    ClassDB::bind_method(D_METHOD("note_on", "time", "preset_index", "key", "velocity"), &SoundFontPlayer::note_on);
+    ClassDB::bind_method(D_METHOD("note_off", "time", "preset_index", "key"), &SoundFontPlayer::note_off);
+    ClassDB::bind_method(D_METHOD("note_off_all", "time"), &SoundFontPlayer::note_off_all);
     ClassDB::bind_method(D_METHOD("physics_process"), &SoundFontPlayer::_physics_process);
 }
