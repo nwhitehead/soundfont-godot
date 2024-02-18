@@ -62,6 +62,10 @@ note_d2={
 ]
 }
 
+[physics]
+
+common/physics_ticks_per_second=10
+
 [rendering]
 
 renderer/rendering_method="mobile"

@@ -1,3 +1,4 @@
+
 #ifndef SOUNDFONTPLAYER_H
 #define SOUNDFONTPLAYER_H
 
@@ -5,9 +6,11 @@
 
 #include <godot_cpp/classes/audio_stream_player.hpp>
 #include <godot_cpp/classes/ref.hpp>
+#include <godot_cpp/templates/vector.hpp>
 #include <godot_cpp/variant/packed_vector2_array.hpp>
 
 #include "sound_font.h"
+#include "sound_font_event.h"
 #include "tsf/tsf.h"
 
 namespace godot {
@@ -26,6 +29,7 @@ private:
     int max_samples_available;
     int process_count;
     std::mutex mutex;
+    Vector<Event> events;
 
 protected:
     static void _bind_methods();
@@ -54,6 +58,8 @@ public:
     void note_off_all();
 
     double get_time();
+    void schedule_note_off(double time, int preset_index, int key);
+    void schedule_note_on(double time, int preset_index, int key, float velocity);
 
     void _physics_process();
 };

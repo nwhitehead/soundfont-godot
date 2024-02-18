@@ -23,7 +23,7 @@ A S D F G H J K L"
 editable = false
 
 [node name="ArpTimer" type="Timer" parent="."]
-wait_time = 0.2
+wait_time = 0.15
 autostart = true
 
 [node name="ButtonG" type="Button" parent="."]

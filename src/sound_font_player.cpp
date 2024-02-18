@@ -176,18 +176,20 @@ double SoundFontPlayer::get_time() {
     return time;
 }
 
+void SoundFontPlayer::schedule_note_off(double time, int preset_index, int key) {
+    events.push_back(Event(time, EventType::NOTE_OFF, preset_index, key, 0.0f));
+}
+
+void SoundFontPlayer::schedule_note_on(double time, int preset_index, int key, float velocity) {
+    events.push_back(Event(time, EventType::NOTE_ON, preset_index, key, velocity));
+}
+
 void SoundFontPlayer::_physics_process() {
-    double delta = 1.0/60.0;
-    int count_max = 8;
-    process_count++;
-    if (process_count < count_max) {
-        return;
-    }
-    process_count = 0;
-    time += delta * count_max;
+    double delta = 1.0 / Engine::get_singleton()->get_physics_ticks_per_second();
+    time += delta;
     if (Engine::get_singleton()->is_editor_hint()) {
         // In editor, don't play SoundFont audio data
-        // Also reset max_samples_available in case buffer settings modified
+        // Also reset max_samples_available in case the buffer settings are modified
         max_samples_available = 0;
         return;
     }
@@ -211,7 +213,7 @@ void SoundFontPlayer::_physics_process() {
         max_samples_available = std::max(max_samples_available, available);
     }
     int goal_available = static_cast<int>(max_samples_available * goal_available_ratio);
-    int ideal_samples = static_cast<int>(delta * mix_rate * count_max);
+    int ideal_samples = static_cast<int>(delta * mix_rate);
     // If buffer is too empty, use large samples to help fill it up
     // Otherwise use small samples to let it drain
     // Push number of samples to correct part of gap to goal_available
@@ -245,5 +247,7 @@ void SoundFontPlayer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("note_off", "preset_index", "key"), &SoundFontPlayer::note_off);
     ClassDB::bind_method(D_METHOD("note_off_all"), &SoundFontPlayer::note_off_all);
     ClassDB::bind_method(D_METHOD("get_time"), &SoundFontPlayer::get_time);
+    ClassDB::bind_method(D_METHOD("schedule_note_off", "time", "preset_index", "key"), &SoundFontPlayer::schedule_note_off);
+    ClassDB::bind_method(D_METHOD("schedule_note_on", "time", "preset_index", "key", "velocity"), &SoundFontPlayer::schedule_note_on);
     ClassDB::bind_method(D_METHOD("physics_process"), &SoundFontPlayer::_physics_process);
 }
