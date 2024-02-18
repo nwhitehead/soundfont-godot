@@ -7,12 +7,13 @@ enum class EventType {
 };
 
 class Event {
+public:
     double time;
     EventType event_type;
     int preset_index;
     int key;
     float velocity;
-public:
+
     Event();
     Event(double time, EventType event_type, int preset_index, int key, float velocity);
 };

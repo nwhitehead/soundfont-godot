@@ -8,6 +8,8 @@ var arpseq = [0, 1, 2, 3, 2, 1, 0, 1]
 var arppos = -1
 var oldtime = 0
 
+var time = 0
+
 func _ready():
 	player = $SoundFontPlayer
 	print("sf2 preset: ", player.get_presetname(preset))
@@ -30,16 +32,16 @@ func _input(event):
 		if event.is_action_released(note):
 			player.note_off(preset, base_note + notes[note])
 
-func _on_arp_timer_timeout():
-	player.note_off_all()
-	arppos += 1
-	if arppos >= len(arpseq):
-		arppos = 0
-	var time = player.get_time()
-	var delta = time - oldtime
-	print('note_on delta=', delta)
-	oldtime = time
-	player.note_on(preset, base_note + arpnotes[arpseq[arppos]], 1.0)
+func _process(delta):
+	var ptime = player.get_time()
+	var dur = 0.0121
+	while time < ptime + 1.0 / Engine.get_physics_ticks_per_second() + 0.1:
+		player.schedule_note_on(time, 0, base_note + arpnotes[arpseq[arppos]], 1.0)
+		player.schedule_note_off(time + dur/2, 0, base_note + arpnotes[arpseq[arppos]])
+		time += dur
+		arppos += 1
+		if arppos >= len(arpseq):
+			arppos = 0
 
 func _on_button_button_down_c():
 	# C E G C

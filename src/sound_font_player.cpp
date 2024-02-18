@@ -14,7 +14,6 @@
 using namespace godot;
 
 SoundFontPlayer::SoundFontPlayer() {
-    const std::lock_guard<std::mutex> lock(mutex);
     Ref<AudioStreamGenerator> genstream;
     genstream.instantiate();
     // Set reasonable snappy default latency
@@ -34,7 +33,6 @@ SoundFontPlayer::SoundFontPlayer() {
 }
 
 SoundFontPlayer::~SoundFontPlayer() {
-    const std::lock_guard<std::mutex> lock(mutex);
     set_stream(nullptr);
     if (generator) {
         tsf_close(generator);
@@ -52,7 +50,6 @@ void SoundFontPlayer::setup_generator() {
 }
 
 void SoundFontPlayer::set_soundfont(Ref<SoundFont> p_soundfont) {
-    const std::lock_guard<std::mutex> lock(mutex);
     if (generator) {
         tsf_close(generator);
         generator = nullptr;
@@ -68,44 +65,36 @@ void SoundFontPlayer::set_soundfont(Ref<SoundFont> p_soundfont) {
 }
 
 Ref<SoundFont> SoundFontPlayer::get_soundfont() {
-    const std::lock_guard<std::mutex> lock(mutex);
     return soundfont;
 }
 
 void SoundFontPlayer::set_gain(float p_gain) {
-    const std::lock_guard<std::mutex> lock(mutex);
     gain = p_gain;
     setup_generator();
 }
 
 float SoundFontPlayer::get_gain() {
-    const std::lock_guard<std::mutex> lock(mutex);
     return gain;
 }
 
 void SoundFontPlayer::set_max_voices(int p_max_voices) {
-    const std::lock_guard<std::mutex> lock(mutex);
     max_voices = p_max_voices;
     setup_generator();
 }
 
 int SoundFontPlayer::get_max_voices() {
-    const std::lock_guard<std::mutex> lock(mutex);
     return max_voices;
 }
 
 void SoundFontPlayer::set_goal_available_ratio(float p_goal_available_ratio) {
-    const std::lock_guard<std::mutex> lock(mutex);
     goal_available_ratio = p_goal_available_ratio;
 }
 
 float SoundFontPlayer::get_goal_available_ratio() {
-    const std::lock_guard<std::mutex> lock(mutex);
     return goal_available_ratio;
 }
 
 int SoundFontPlayer::get_presetindex(int bank, int preset_number) {
-    const std::lock_guard<std::mutex> lock(mutex);
     if (!generator) {
         return -1;
     }
@@ -113,7 +102,6 @@ int SoundFontPlayer::get_presetindex(int bank, int preset_number) {
 }
 
 int SoundFontPlayer::get_presetcount() {
-    const std::lock_guard<std::mutex> lock(mutex);
     if (!generator) {
         return -1;
     }
@@ -121,7 +109,6 @@ int SoundFontPlayer::get_presetcount() {
 }
 
 String SoundFontPlayer::get_presetname(int preset_index) {
-    const std::lock_guard<std::mutex> lock(mutex);
     if (!generator) {
         UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
         return String("");
@@ -130,7 +117,6 @@ String SoundFontPlayer::get_presetname(int preset_index) {
 }
 
 void SoundFontPlayer::note_on(int preset_index, int key, float velocity) {
-    const std::lock_guard<std::mutex> lock(mutex);
     if (!generator) {
         UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
         return;
@@ -142,7 +128,6 @@ void SoundFontPlayer::note_on(int preset_index, int key, float velocity) {
 }
 
 void SoundFontPlayer::note_off(int preset_index, int key) {
-    const std::lock_guard<std::mutex> lock(mutex);
     if (!generator) {
         UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
         return;
@@ -151,7 +136,6 @@ void SoundFontPlayer::note_off(int preset_index, int key) {
 }
 
 void SoundFontPlayer::note_off_all() {
-    const std::lock_guard<std::mutex> lock(mutex);
     if (!generator) {
         UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
         return;
@@ -160,7 +144,6 @@ void SoundFontPlayer::note_off_all() {
 }
 
 PackedVector2Array SoundFontPlayer::render(int samples) {
-    const std::lock_guard<std::mutex> lock(mutex);
     PackedVector2Array result{};
     if (!generator) {
         UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
@@ -172,7 +155,6 @@ PackedVector2Array SoundFontPlayer::render(int samples) {
 }
 
 double SoundFontPlayer::get_time() {
-    const std::lock_guard<std::mutex> lock(mutex);
     return time;
 }
 
@@ -186,7 +168,6 @@ void SoundFontPlayer::schedule_note_on(double time, int preset_index, int key, f
 
 void SoundFontPlayer::_physics_process() {
     double delta = 1.0 / Engine::get_singleton()->get_physics_ticks_per_second();
-    time += delta;
     if (Engine::get_singleton()->is_editor_hint()) {
         // In editor, don't play SoundFont audio data
         // Also reset max_samples_available in case the buffer settings are modified
@@ -224,7 +205,54 @@ void SoundFontPlayer::_physics_process() {
         // Nothing to render
         return;
     }
-    playback->push_buffer(render(samples));
+    //UtilityFunctions::print("SoundFontPlayer samples=", samples, " events=", events.size());
+    int rendered_samples = 0;
+    int loop_count = 0;
+    int loop_limit = 256;
+    while (rendered_samples < samples) {
+        // First make sure we are not stuck in infinite loop
+        loop_count++;
+        if (loop_count > loop_limit) {
+            UtilityFunctions::print("SoundFontPlayer too many iteration in main processing loop, aborting");
+            break;
+        }
+        // Events must be sorted by time (earliest first)
+        // First look for any events that were scheduled in past and do them
+        for (auto &event : events) {
+            if (event.time <= time) {
+                switch (event.event_type) {
+                    case EventType::NOTE_OFF:
+                        // UtilityFunctions::print("SoundFontPlayer NOTE_OFF time=", time, " rendered_samples=", rendered_samples, " event.time=", event.time, " event.key=", event.key);
+                        note_off(event.preset_index, event.key);
+                        break;
+                    case EventType::NOTE_ON:
+                        // UtilityFunctions::print("SoundFontPlayer NOTE_ON time=", time, " rendered_samples=", rendered_samples, " event.time=", event.time, " event.key=", event.key);
+                        note_on(event.preset_index, event.key, event.velocity);
+                        break;
+                }
+            }
+        }
+        // Now remove events in the past
+        int position = 0;
+        while (position < events.size() && events[position].time <= time) {
+            position++;
+        }
+        for (int i = 0; i < position; i++) {
+            events.remove_at(0);
+        }
+        // Now find timestep to render too
+        int render_size = samples - rendered_samples;
+        if (events.size() > 0) {
+            // How long until next event
+            double delta_event_time = events[0].time - time;
+            // Render shorter than remaining buffer if the event intersects the current buffer
+            // +1 is to ensure we are making progress, even if floating point result rounds down
+            render_size = std::min(render_size, static_cast<int>(delta_event_time * mix_rate) + 1);
+        }
+        time += render_size / mix_rate;
+        playback->push_buffer(render(render_size));
+        rendered_samples += render_size;
+    }
 }
 
 void SoundFontPlayer::_bind_methods() {

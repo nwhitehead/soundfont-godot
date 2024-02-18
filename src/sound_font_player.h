@@ -2,8 +2,6 @@
 #ifndef SOUNDFONTPLAYER_H
 #define SOUNDFONTPLAYER_H
 
-#include <mutex>
-
 #include <godot_cpp/classes/audio_stream_player.hpp>
 #include <godot_cpp/classes/ref.hpp>
 #include <godot_cpp/templates/vector.hpp>
@@ -28,7 +26,6 @@ private:
     float goal_available_ratio;
     int max_samples_available;
     int process_count;
-    std::mutex mutex;
     Vector<Event> events;
 
 protected:
