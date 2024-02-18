@@ -14,6 +14,7 @@
 using namespace godot;
 
 SoundFontPlayer::SoundFontPlayer() {
+    const std::lock_guard<std::mutex> lock(mutex);
     Ref<AudioStreamGenerator> genstream;
     genstream.instantiate();
     // Set reasonable snappy default latency
@@ -29,9 +30,11 @@ SoundFontPlayer::SoundFontPlayer() {
     // Default goal is to have 80% of buffer available (so use 20% of 100 ms for buffer, about 20 ms of buffer delay)
     goal_available_ratio = 0.8f;
     max_samples_available = 0;
+    process_count = 0;
 }
 
 SoundFontPlayer::~SoundFontPlayer() {
+    const std::lock_guard<std::mutex> lock(mutex);
     set_stream(nullptr);
     if (generator) {
         tsf_close(generator);
@@ -49,6 +52,7 @@ void SoundFontPlayer::setup_generator() {
 }
 
 void SoundFontPlayer::set_soundfont(Ref<SoundFont> p_soundfont) {
+    const std::lock_guard<std::mutex> lock(mutex);
     if (generator) {
         tsf_close(generator);
         generator = nullptr;
@@ -63,51 +67,61 @@ void SoundFontPlayer::set_soundfont(Ref<SoundFont> p_soundfont) {
     setup_generator();
 }
 
-Ref<SoundFont> SoundFontPlayer::get_soundfont() const {
+Ref<SoundFont> SoundFontPlayer::get_soundfont() {
+    const std::lock_guard<std::mutex> lock(mutex);
     return soundfont;
 }
 
 void SoundFontPlayer::set_gain(float p_gain) {
+    const std::lock_guard<std::mutex> lock(mutex);
     gain = p_gain;
     setup_generator();
 }
 
-float SoundFontPlayer::get_gain() const {
+float SoundFontPlayer::get_gain() {
+    const std::lock_guard<std::mutex> lock(mutex);
     return gain;
 }
 
 void SoundFontPlayer::set_max_voices(int p_max_voices) {
+    const std::lock_guard<std::mutex> lock(mutex);
     max_voices = p_max_voices;
     setup_generator();
 }
 
-int SoundFontPlayer::get_max_voices() const {
+int SoundFontPlayer::get_max_voices() {
+    const std::lock_guard<std::mutex> lock(mutex);
     return max_voices;
 }
 
 void SoundFontPlayer::set_goal_available_ratio(float p_goal_available_ratio) {
+    const std::lock_guard<std::mutex> lock(mutex);
     goal_available_ratio = p_goal_available_ratio;
 }
 
-float SoundFontPlayer::get_goal_available_ratio() const {
+float SoundFontPlayer::get_goal_available_ratio() {
+    const std::lock_guard<std::mutex> lock(mutex);
     return goal_available_ratio;
 }
 
-int SoundFontPlayer::get_presetindex(int bank, int preset_number) const {
+int SoundFontPlayer::get_presetindex(int bank, int preset_number) {
+    const std::lock_guard<std::mutex> lock(mutex);
     if (!generator) {
         return -1;
     }
     return tsf_get_presetindex(generator, bank, preset_number);
 }
 
-int SoundFontPlayer::get_presetcount() const {
+int SoundFontPlayer::get_presetcount() {
+    const std::lock_guard<std::mutex> lock(mutex);
     if (!generator) {
         return -1;
     }
     return tsf_get_presetcount(generator);
 }
 
-String SoundFontPlayer::get_presetname(int preset_index) const {
+String SoundFontPlayer::get_presetname(int preset_index) {
+    const std::lock_guard<std::mutex> lock(mutex);
     if (!generator) {
         UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
         return String("");
@@ -116,6 +130,7 @@ String SoundFontPlayer::get_presetname(int preset_index) const {
 }
 
 void SoundFontPlayer::note_on(int preset_index, int key, float velocity) {
+    const std::lock_guard<std::mutex> lock(mutex);
     if (!generator) {
         UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
         return;
@@ -127,6 +142,7 @@ void SoundFontPlayer::note_on(int preset_index, int key, float velocity) {
 }
 
 void SoundFontPlayer::note_off(int preset_index, int key) {
+    const std::lock_guard<std::mutex> lock(mutex);
     if (!generator) {
         UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
         return;
@@ -135,6 +151,7 @@ void SoundFontPlayer::note_off(int preset_index, int key) {
 }
 
 void SoundFontPlayer::note_off_all() {
+    const std::lock_guard<std::mutex> lock(mutex);
     if (!generator) {
         UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
         return;
@@ -143,6 +160,7 @@ void SoundFontPlayer::note_off_all() {
 }
 
 PackedVector2Array SoundFontPlayer::render(int samples) {
+    const std::lock_guard<std::mutex> lock(mutex);
     PackedVector2Array result{};
     if (!generator) {
         UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
@@ -153,13 +171,20 @@ PackedVector2Array SoundFontPlayer::render(int samples) {
     return result;
 }
 
-double SoundFontPlayer::get_time() const {
+double SoundFontPlayer::get_time() {
+    const std::lock_guard<std::mutex> lock(mutex);
     return time;
 }
 
 void SoundFontPlayer::_physics_process() {
     double delta = 1.0/60.0;
-    time += delta;
+    int count_max = 8;
+    process_count++;
+    if (process_count < count_max) {
+        return;
+    }
+    process_count = 0;
+    time += delta * count_max;
     if (Engine::get_singleton()->is_editor_hint()) {
         // In editor, don't play SoundFont audio data
         // Also reset max_samples_available in case buffer settings modified
@@ -186,7 +211,7 @@ void SoundFontPlayer::_physics_process() {
         max_samples_available = std::max(max_samples_available, available);
     }
     int goal_available = static_cast<int>(max_samples_available * goal_available_ratio);
-    int ideal_samples = static_cast<int>(delta * mix_rate);
+    int ideal_samples = static_cast<int>(delta * mix_rate * count_max);
     // If buffer is too empty, use large samples to help fill it up
     // Otherwise use small samples to let it drain
     // Push number of samples to correct part of gap to goal_available
