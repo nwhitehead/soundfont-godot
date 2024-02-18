@@ -32,6 +32,7 @@ protected:
     static void _bind_methods();
     PackedVector2Array render(int samples);
     void setup_generator();
+    void add_event(const Event &event);
     void do_event(const Event &event);
 
 public:

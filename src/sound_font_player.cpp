@@ -127,11 +127,18 @@ int SoundFontPlayer::get_active_voice_count() {
     return tsf_active_voice_count(generator);
 }
 
+void SoundFontPlayer::add_event(const Event &event) {
+    int position = 0;
+    int size = events.size();
+    while (size && position < size && events[position].time < event.time) position++;
+    events.insert(position, event);
+}
+
 void SoundFontPlayer::note_off(double time, int preset_index, int key) {
     Event evt(time, EventType::NOTE_OFF);
     evt.preset_index = preset_index;
     evt.key = key;
-    events.push_back(evt);
+    add_event(evt);
 }
 
 void SoundFontPlayer::note_on(double time, int preset_index, int key, float velocity) {
@@ -139,18 +146,18 @@ void SoundFontPlayer::note_on(double time, int preset_index, int key, float velo
     evt.preset_index = preset_index;
     evt.key = key;
     evt.velocity = velocity;
-    events.push_back(evt);
+    add_event(evt);
 }
 
 void SoundFontPlayer::note_off_all(double time) {
-    events.push_back(Event(time, EventType::NOTE_OFF_ALL));
+    add_event(Event(time, EventType::NOTE_OFF_ALL));
 }
 
 void SoundFontPlayer::channel_set_presetindex(double time, int channel, int preset_index) {
     Event evt(time, EventType::SET_PRESETINDEX);
     evt.channel = channel;
     evt.preset_index = preset_index;
-    events.push_back(evt);
+    add_event(evt);
 }
 
 void SoundFontPlayer::channel_set_presetnumber(double time, int channel, int preset_number, bool drums) {
@@ -158,21 +165,21 @@ void SoundFontPlayer::channel_set_presetnumber(double time, int channel, int pre
     evt.channel = channel;
     evt.preset_index = preset_number;
     evt.drums = drums;
-    events.push_back(evt);
+    add_event(evt);
 }
 
 void SoundFontPlayer::channel_set_bank(double time, int channel, int bank) {
     Event evt(time, EventType::SET_BANK);
     evt.channel = channel;
     evt.bank = bank;
-    events.push_back(evt);
+    add_event(evt);
 }
 
 void SoundFontPlayer::channel_set_pan(double time, int channel, float pan) {
     Event evt(time, EventType::SET_PAN);
     evt.channel = channel;
     evt.velocity = pan;
-    events.push_back(evt);
+    add_event(evt);
 }
 
 void SoundFontPlayer::channel_note_on(double time, int channel, int key, float velocity) {
@@ -180,15 +187,14 @@ void SoundFontPlayer::channel_note_on(double time, int channel, int key, float v
     evt.channel = channel;
     evt.key = key;
     evt.velocity = velocity;
-    events.push_back(evt);
-
+    add_event(evt);
 }
 
 void SoundFontPlayer::channel_note_off(double time, int channel, int key) {
     Event evt(time, EventType::NOTE_OFF);
     evt.channel = channel;
     evt.key = key;
-    events.push_back(evt);
+    add_event(evt);
 }
 
 void SoundFontPlayer::do_event(const Event &event) {
