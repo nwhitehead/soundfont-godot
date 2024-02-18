@@ -157,31 +157,12 @@ String SoundFontPlayer::get_presetname(int preset_index) const {
     return String(tsf_get_presetname(generator, preset_index));
 }
 
-String SoundFontPlayer::bank_get_presetname(int bank, int preset_number) const {
-    if (!generator) {
-        UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
-        return String("");
-    }
-    return String(tsf_bank_get_presetname(generator, bank, preset_number));
-}
-
 void SoundFontPlayer::note_on(int preset_index, int key, float velocity) {
     if (!generator) {
         UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
         return;
     }
     if (!tsf_note_on(generator, preset_index, key, velocity)) {
-        UtilityFunctions::printerr("Could not allocate voice for note");
-        return;
-    }
-}
-
-void SoundFontPlayer::bank_note_on(int bank, int preset_number, int key, float velocity) {
-    if (!generator) {
-        UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
-        return;
-    }
-    if (!tsf_bank_note_on(generator, bank, preset_number, key, velocity)) {
         UtilityFunctions::printerr("Could not allocate voice for note");
         return;
     }
@@ -195,17 +176,6 @@ void SoundFontPlayer::note_off(int preset_index, int key) {
     tsf_note_off(generator, preset_index, key);
 }
 
-void SoundFontPlayer::bank_note_off(int bank, int preset_number, int key) {
-    if (!generator) {
-        UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
-        return;
-    }
-    if (!tsf_bank_note_off(generator, bank, preset_number, key)) {
-        UtilityFunctions::printerr("Preset not found");
-        return;
-    }
-}
-
 PackedVector2Array SoundFontPlayer::render(int samples) {
     PackedVector2Array result{};
     if (!generator) {
@@ -215,6 +185,10 @@ PackedVector2Array SoundFontPlayer::render(int samples) {
     result.resize(samples);
     tsf_render_float(generator, reinterpret_cast<float*>(result.ptrw()), samples);
     return result;
+}
+
+double SoundFontPlayer::get_time() const {
+    return time;
 }
 
 void SoundFontPlayer::_bind_methods() {
@@ -233,10 +207,8 @@ void SoundFontPlayer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_presetindex", "bank", "preset_number"), &SoundFontPlayer::get_presetindex);
     ClassDB::bind_method(D_METHOD("get_presetcount"), &SoundFontPlayer::get_presetcount);
     ClassDB::bind_method(D_METHOD("get_presetname", "preset_index"), &SoundFontPlayer::get_presetname);
-    ClassDB::bind_method(D_METHOD("bank_get_presetname", "bank", "preset_number"), &SoundFontPlayer::bank_get_presetname);
     ClassDB::bind_method(D_METHOD("note_on", "preset_index", "key", "velocity"), &SoundFontPlayer::note_on);
-    ClassDB::bind_method(D_METHOD("bank_note_on", "bank", "preset_number", "key", "velocity"), &SoundFontPlayer::bank_note_on);
     ClassDB::bind_method(D_METHOD("note_off", "preset_index", "key"), &SoundFontPlayer::note_off);
-    ClassDB::bind_method(D_METHOD("bank_note_off", "bank", "preset_number", "key"), &SoundFontPlayer::bank_note_off);
+    ClassDB::bind_method(D_METHOD("get_time"), &SoundFontPlayer::get_time);
     ClassDB::bind_method(D_METHOD("physics_process"), &SoundFontPlayer::_physics_process);
 }
