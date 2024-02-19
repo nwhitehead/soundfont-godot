@@ -18,6 +18,7 @@ var oldtime = 0
 var time = 0
 var song
 var song_time = 0
+var song_position = 0
 
 func _ready():
 	song = ResourceLoader.load('res://1080-c01.mid')
@@ -29,20 +30,12 @@ func _ready():
 	player.channel_set_presetnumber(0, 4, 42, false)
 	player.channel_set_presetnumber(0, 5, 43, false)
 	player.channel_set_presetnumber(0, 6, 44, false)
-	for i in song.get_time().size():
-		var t = song.get_time()[i]
-		var type = song.get_type()[i]
-		var channel = song.get_channel()[i]
-		var key = song.get_arg0()[i]
-		var vel = song.get_arg1()[i] / 255.0
-		if type == Midi.NOTE_ON:
-			print('t=', t, ' beat=', song.get_beat()[i])
-			player.channel_note_on(t, 3 + channel, key, vel)
 
 func _process(delta):
 	var ptime = player.get_time()
 	var dur = 0.171
-	while time < ptime + 1.0 / Engine.get_physics_ticks_per_second() + 0.1:
+	var end_time = ptime + 1.0 / Engine.get_physics_ticks_per_second() + 0.1
+	while time < end_time:
 		if play_arp:
 			var note = base_note + arpnotes[arpseq[arppos]]
 			player.channel_note_on(time, 2, note, 0.5)
@@ -64,6 +57,18 @@ func _process(delta):
 		if arppos >= len(arpseq):
 			arppos = 0			
 
+	while song_position < song.get_time().size() and song.get_time()[song_position] < end_time:
+		var t = song.get_time()[song_position]
+		var type = song.get_type()[song_position]
+		var channel = song.get_channel()[song_position]
+		var key = song.get_arg0()[song_position]
+		var vel = song.get_arg1()[song_position] / 255.0
+		song_position += 1
+		if type == Midi.NOTE_ON:
+			if play_song:
+				player.channel_note_on(t, 3 + channel, key, vel)
+
+
 func _on_button_button_down_c():
 	# C E G C
 	player.channel_set_pan(0, 2, 0)
@@ -82,3 +87,5 @@ func _on_drum_toggle_toggled(toggled_on):
 
 func _on_song_toggle_toggled(toggled_on):
 	play_song = toggled_on
+	if not play_song:
+		player.note_off_all(0)
