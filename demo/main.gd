@@ -1,7 +1,7 @@
 extends Node2D
 
 var play_arp: bool = false
-var play_drums: bool = true
+var play_drums: bool = false
 var play_song: bool = true
 var preset: int = 27 # 25
 var drum_kit: int = 20
@@ -25,10 +25,10 @@ func _ready():
 	print("sf2 preset: ", player.get_presetname(preset))
 	player.channel_set_presetnumber(0, 1, drum_kit, true)
 	player.channel_set_presetnumber(0, 2, preset, false)
-	player.channel_set_presetnumber(0, 3, 0, false)
-	player.channel_set_presetnumber(0, 4, 0, false)
-	player.channel_set_presetnumber(0, 5, 0, false)
-	player.channel_set_presetnumber(0, 6, 0, false)
+	player.channel_set_presetnumber(0, 3, 41, false)
+	player.channel_set_presetnumber(0, 4, 42, false)
+	player.channel_set_presetnumber(0, 5, 43, false)
+	player.channel_set_presetnumber(0, 6, 44, false)
 	for i in song.get_time().size():
 		var t = song.get_time()[i]
 		var type = song.get_type()[i]
@@ -36,12 +36,11 @@ func _ready():
 		var key = song.get_arg0()[i]
 		var vel = song.get_arg1()[i] / 255.0
 		if type == Midi.NOTE_ON:
-			print("t=", t, " key=", key, " vel=", vel)
+			print('t=', t, ' beat=', song.get_beat()[i])
 			player.channel_note_on(t, 3 + channel, key, vel)
 
 func _process(delta):
 	var ptime = player.get_time()
-	print('ptime=', ptime)
 	var dur = 0.171
 	while time < ptime + 1.0 / Engine.get_physics_ticks_per_second() + 0.1:
 		if play_arp:

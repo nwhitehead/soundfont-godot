@@ -27,6 +27,7 @@ class Midi : public Resource {
     GDCLASS(Midi, Resource)
 private:
     PackedFloat32Array time;
+    PackedFloat32Array beat;
     PackedByteArray type;
     PackedByteArray channel;
     PackedByteArray arg0;
@@ -51,6 +52,8 @@ public:
 
     void set_time(const PackedFloat32Array &time);
     PackedFloat32Array get_time() const;
+    void set_beat(const PackedFloat32Array &time);
+    PackedFloat32Array get_beat() const;
     void set_type(const PackedByteArray &type);
     PackedByteArray get_type() const;
     void set_channel(const PackedByteArray &channel);
