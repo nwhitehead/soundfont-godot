@@ -27,6 +27,14 @@ void Midi::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::PACKED_BYTE_ARRAY, "channel"), "set_channel", "get_channel");
     ADD_PROPERTY(PropertyInfo(Variant::PACKED_BYTE_ARRAY, "arg0"), "set_arg0", "get_arg0");
     ADD_PROPERTY(PropertyInfo(Variant::PACKED_BYTE_ARRAY, "arg1"), "set_arg1", "get_arg1");
+    BIND_ENUM_CONSTANT(NOTE_OFF);
+    BIND_ENUM_CONSTANT(NOTE_ON);
+    BIND_ENUM_CONSTANT(KEY_PRESSURE);
+    BIND_ENUM_CONSTANT(CONTROL_CHANGE);
+    BIND_ENUM_CONSTANT(PROGRAM_CHANGE);
+    BIND_ENUM_CONSTANT(CHANNEL_PRESSURE);
+    BIND_ENUM_CONSTANT(PITCH_BEND);
+    BIND_ENUM_CONSTANT(SET_TEMPO);
 }
 
 void Midi::set_time(const PackedFloat32Array &p_time) { time = p_time; }
@@ -123,11 +131,15 @@ Error MidiImportPlugin::_import(const String &source_file,
         time[i] = (pos->time) / 1000.0f;
         type[i] = pos->type;
         channel[i] = pos->channel;
+        arg0[i] = pos->key;
+        arg1[i] = pos->velocity;
         pos = pos->next;
     }
     sf->set_time(time);
     sf->set_type(type);
     sf->set_channel(channel);
+    sf->set_arg0(arg0);
+    sf->set_arg1(arg1);
     tml_free(parsed);
     return ResourceSaver::get_singleton()->save(sf, String(save_path) + String(".") + _get_save_extension());
 }

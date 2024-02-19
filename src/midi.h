@@ -15,7 +15,7 @@ namespace godot {
 
 struct MidiEvent {
     double time;
-    TMLController type;
+    TMLMessageType type;
     int channel;
     int8_t dataA, dataB;
 };
@@ -25,7 +25,6 @@ struct MidiEvent {
 class Midi : public Resource {
 
     GDCLASS(Midi, Resource)
-
 private:
     PackedFloat32Array time;
     PackedByteArray type;
@@ -37,6 +36,19 @@ protected:
     static void _bind_methods();
 
 public:
+
+    enum MessageType
+    {
+        NOTE_OFF = 0x80,
+        NOTE_ON = 0x90,
+        KEY_PRESSURE = 0xA0,
+        CONTROL_CHANGE = 0xB0,
+        PROGRAM_CHANGE = 0xC0,
+        CHANNEL_PRESSURE = 0xD0,
+        PITCH_BEND = 0xE0,
+        SET_TEMPO = 0x51
+    };
+
     void set_time(const PackedFloat32Array &time);
     PackedFloat32Array get_time() const;
     void set_type(const PackedByteArray &type);
@@ -87,5 +99,7 @@ public:
 
 
 }
+
+VARIANT_ENUM_CAST(Midi::MessageType);
 
 #endif
