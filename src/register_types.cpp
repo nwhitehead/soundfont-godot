@@ -7,6 +7,7 @@
 #include "sound_font.h"
 #include "sound_font_player.h"
 #include "sound_font_import.h"
+#include "midi.h"
 
 using namespace godot;
 
@@ -14,11 +15,15 @@ void initialize_module(ModuleInitializationLevel p_level) {
     if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
         ClassDB::register_class<SoundFont>();
         ClassDB::register_class<SoundFontPlayer>();
+        ClassDB::register_class<Midi>();
     }
     if (p_level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
         ClassDB::register_class<SoundFontImportPlugin>();
         ClassDB::register_class<SoundFontPlugin>();
         EditorPlugins::add_by_type<SoundFontPlugin>();
+        ClassDB::register_class<MidiImportPlugin>();
+        ClassDB::register_class<MidiPlugin>();
+        EditorPlugins::add_by_type<MidiPlugin>();
     }
 }
 

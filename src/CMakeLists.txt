@@ -8,6 +8,8 @@ target_sources( ${PROJECT_NAME}
         sound_font_player.cpp
         sound_font_import.h
         sound_font_import.cpp
+        midi.h
+        midi.cpp
         register_types.cpp
         tsf/tsf.h
 )
