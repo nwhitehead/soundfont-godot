@@ -25,25 +25,24 @@ A S D F G H J K L"
 editable = false
 
 [node name="ButtonG" type="Button" parent="."]
-offset_left = 142.0
-offset_top = 204.0
-offset_right = 203.0
-offset_bottom = 247.0
+offset_left = 235.0
+offset_top = 198.0
+offset_right = 296.0
+offset_bottom = 241.0
 text = "G"
 
 [node name="ButtonC" type="Button" parent="."]
-offset_left = 142.0
-offset_top = 153.0
-offset_right = 204.0
-offset_bottom = 192.0
+offset_left = 141.0
+offset_top = 202.0
+offset_right = 203.0
+offset_bottom = 241.0
 text = "C"
 
 [node name="ArpToggle" type="CheckButton" parent="."]
-offset_left = 140.0
-offset_top = 64.0
-offset_right = 303.0
-offset_bottom = 96.0
-button_pressed = true
+offset_left = 138.0
+offset_top = 54.0
+offset_right = 301.0
+offset_bottom = 86.0
 text = "Arpeggiator"
 
 [node name="DrumToggle" type="CheckButton" parent="."]
@@ -55,7 +54,21 @@ button_pressed = true
 text = "Drums
 "
 
+[node name="SongToggle" type="CheckButton" parent="."]
+anchors_preset = -1
+anchor_left = -0.853
+anchor_top = -3.11
+anchor_right = -0.853
+anchor_bottom = -3.11
+offset_left = 143.0
+offset_top = 140.0
+offset_right = 303.0
+offset_bottom = 171.0
+button_pressed = true
+text = "Song"
+
 [connection signal="button_down" from="ButtonG" to="." method="_on_button_button_down_g"]
 [connection signal="button_down" from="ButtonC" to="." method="_on_button_button_down_c"]
 [connection signal="toggled" from="ArpToggle" to="." method="_on_arp_toggle_toggled"]
 [connection signal="toggled" from="DrumToggle" to="." method="_on_drum_toggle_toggled"]
+[connection signal="toggled" from="SongToggle" to="." method="_on_song_toggle_toggled"]
