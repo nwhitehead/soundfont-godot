@@ -7,6 +7,8 @@
 #include <godot_cpp/classes/audio_stream_generator.hpp>
 #include <godot_cpp/classes/audio_stream_generator_playback.hpp>
 
+// Include support for OGG Vorbis file format (detected automatically by TinySoundFont header)
+#include "stb/stb_vorbis.c"
 
 #define TSF_IMPLEMENTATION
 #include "tsf/tsf.h"
@@ -23,7 +25,7 @@ SoundFontPlayer::SoundFontPlayer() {
     // Start with quiet gain, for mixing 4 voices at 0 dB
     // Actual required gain depends on sf2 levels.
     gain = -12.0f;
-    max_voices = 32;
+    max_voices = 128;
     set_autoplay(true);
     time = 0.0;
     // Default goal is to have 80% of buffer available (so use 20% of 100 ms for buffer, about 20 ms of buffer delay)
@@ -130,7 +132,7 @@ int SoundFontPlayer::get_active_voice_count() {
 void SoundFontPlayer::add_event(const Event &event) {
     int position = 0;
     int size = events.size();
-    while (size && position < size && events[position].time < event.time) position++;
+    while (size && position < size && events[position].time <= event.time) position++;
     events.insert(position, event);
 }
 
@@ -151,6 +153,10 @@ void SoundFontPlayer::note_on(double time, int preset_index, int key, float velo
 
 void SoundFontPlayer::note_off_all(double time) {
     add_event(Event(time, EventType::NOTE_OFF_ALL));
+}
+
+void SoundFontPlayer::clear_events() {
+    events.clear();
 }
 
 void SoundFontPlayer::channel_set_presetindex(double time, int channel, int preset_index) {
@@ -337,8 +343,9 @@ void SoundFontPlayer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_goal_available_ratio"), &SoundFontPlayer::get_goal_available_ratio);
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "soundfont", PROPERTY_HINT_RESOURCE_TYPE, "SoundFont"), "set_soundfont", "get_soundfont");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "gain", PROPERTY_HINT_RANGE, "-48.0,12.0,0.1,suffix:dB"), "set_gain", "get_gain");
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_voices", PROPERTY_HINT_RANGE, "1,256,1"), "set_max_voices", "get_max_voices");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_voices", PROPERTY_HINT_RANGE, "1,1024,1"), "set_max_voices", "get_max_voices");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "goal_available_ratio", PROPERTY_HINT_RANGE, "0.0,1.0,0.01"), "set_goal_available_ratio", "get_goal_available_ratio");
+
     ClassDB::bind_method(D_METHOD("get_time"), &SoundFontPlayer::get_time);
     ClassDB::bind_method(D_METHOD("get_presetindex", "bank", "preset_number"), &SoundFontPlayer::get_presetindex);
     ClassDB::bind_method(D_METHOD("get_presetcount"), &SoundFontPlayer::get_presetcount);
@@ -347,6 +354,7 @@ void SoundFontPlayer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("note_on", "time", "preset_index", "key", "velocity"), &SoundFontPlayer::note_on);
     ClassDB::bind_method(D_METHOD("note_off", "time", "preset_index", "key"), &SoundFontPlayer::note_off);
     ClassDB::bind_method(D_METHOD("note_off_all", "time"), &SoundFontPlayer::note_off_all);
+    ClassDB::bind_method(D_METHOD("clear_events"), &SoundFontPlayer::clear_events);
 
     ClassDB::bind_method(D_METHOD("channel_set_presetindex", "time", "channel", "preset_index"), &SoundFontPlayer::channel_set_presetindex);
     ClassDB::bind_method(D_METHOD("channel_set_presetnumber", "time", "channel", "preset_number", "drums"), &SoundFontPlayer::channel_set_presetnumber);

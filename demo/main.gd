@@ -2,7 +2,8 @@ extends Node2D
 
 var play_arp: bool = true
 var play_drums: bool = true
-var preset: int = 25
+var preset: int = 27 # 25
+var drum_kit: int = 20
 var preset_drum: int = 35
 var preset_snare: int = 40
 var preset_hihat: int = 42
@@ -19,24 +20,24 @@ func _ready():
 	player = $SoundFontPlayer
 	print("sf2 preset: ", player.get_presetname(preset))
 	player.channel_set_presetnumber(0, 3, preset, false)
-	player.channel_set_presetnumber(0, 1, 1, true)
+	player.channel_set_presetnumber(0, 1, drum_kit, true)
 
 func _process(delta):
 	var ptime = player.get_time()
-	var dur = 0.111
+	var dur = 0.171
 	while time < ptime + 1.0 / Engine.get_physics_ticks_per_second() + 0.1:
 		if play_arp:
 			var note = base_note + arpnotes[arpseq[arppos]]
 			player.channel_note_on(time, 3, note, 0.5)
-			player.channel_note_off(time + dur / 2, 3, note)
+			player.channel_note_off(time + dur, 3, note)
 		if play_drums:
 			if arppos == 0:
 				player.channel_note_on(time, 1, preset_drum, 1.0)
 				player.channel_note_off(time + dur / 2, 1, preset_drum)
-				print('drum time=', time, " num=", player.get_active_voice_count())
+				print("num_voices=", player.get_active_voice_count())
 			else:
 				if arppos == 4:
-					player.channel_note_on(time, 1, preset_snare, 0.5)
+					player.channel_note_on(time, 1, preset_snare, 1.0)
 					player.channel_note_off(time + dur / 2, 1, preset_snare)
 				else:
 					player.channel_note_on(time, 1, preset_hihat, 1.0)
@@ -56,6 +57,8 @@ func _on_button_button_down_g():
 	player.channel_set_pan(0, 3, 1.0)
 	arpnotes = [-1, 2, 7, 11]
 
+func _on_arp_toggle_toggled(toggled_on):
+	play_arp = toggled_on
 
-func _on_button_button_up():
-	play_arp = not play_arp
+func _on_drum_toggle_toggled(toggled_on):
+	play_drums = toggled_on

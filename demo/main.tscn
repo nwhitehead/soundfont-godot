@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://dfhsqj7og2fgr"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_526j8"]
-[ext_resource type="SoundFont" uid="uid://bw3y65shd3ae4" path="res://example.sf2" id="2_xg276"]
+[ext_resource type="SoundFont" uid="uid://dygeiorcyb203" path="res://FluidR3_GM.sf2" id="2_gn1yg"]
 
 [sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_ckiyt"]
 buffer_length = 0.1
@@ -10,7 +10,9 @@ buffer_length = 0.1
 script = ExtResource("1_526j8")
 
 [node name="SoundFontPlayer" type="SoundFontPlayer" parent="."]
-soundfont = ExtResource("2_xg276")
+soundfont = ExtResource("2_gn1yg")
+gain = -4.4
+max_voices = 64
 stream = SubResource("AudioStreamGenerator_ckiyt")
 
 [node name="TextEdit" type="TextEdit" parent="."]
@@ -36,5 +38,24 @@ offset_right = 204.0
 offset_bottom = 192.0
 text = "C"
 
+[node name="ArpToggle" type="CheckButton" parent="."]
+offset_left = 140.0
+offset_top = 64.0
+offset_right = 303.0
+offset_bottom = 96.0
+button_pressed = true
+text = "Arpeggiator"
+
+[node name="DrumToggle" type="CheckButton" parent="."]
+offset_left = 139.0
+offset_top = 99.0
+offset_right = 303.0
+offset_bottom = 130.0
+button_pressed = true
+text = "Drums
+"
+
 [connection signal="button_down" from="ButtonG" to="." method="_on_button_button_down_g"]
 [connection signal="button_down" from="ButtonC" to="." method="_on_button_button_down_c"]
+[connection signal="toggled" from="ArpToggle" to="." method="_on_arp_toggle_toggled"]
+[connection signal="toggled" from="DrumToggle" to="." method="_on_drum_toggle_toggled"]

@@ -17,6 +17,7 @@ void SoundFontImportPlugin::_bind_methods() {
 PackedStringArray SoundFontImportPlugin::_get_recognized_extensions() {
     PackedStringArray result{};
     result.append("sf2");
+    result.append("sfo");
     return result;
 }
 
