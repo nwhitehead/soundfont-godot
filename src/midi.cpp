@@ -14,8 +14,8 @@ namespace godot {
 void Midi::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_time", "time"), &Midi::set_time);
     ClassDB::bind_method(D_METHOD("get_time"), &Midi::get_time);
-    ClassDB::bind_method(D_METHOD("set_beat", "beat"), &Midi::set_beat);
-    ClassDB::bind_method(D_METHOD("get_beat"), &Midi::get_beat);
+    ClassDB::bind_method(D_METHOD("set_bpm", "bpm"), &Midi::set_bpm);
+    ClassDB::bind_method(D_METHOD("get_bpm"), &Midi::get_bpm);
     ClassDB::bind_method(D_METHOD("set_type", "type"), &Midi::set_type);
     ClassDB::bind_method(D_METHOD("get_type"), &Midi::get_type);
     ClassDB::bind_method(D_METHOD("set_channel", "channel"), &Midi::set_channel);
@@ -25,7 +25,7 @@ void Midi::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_arg1", "arg1"), &Midi::set_arg1);
     ClassDB::bind_method(D_METHOD("get_arg1"), &Midi::get_arg1);
     ADD_PROPERTY(PropertyInfo(Variant::PACKED_FLOAT32_ARRAY, "time"), "set_time", "get_time");
-    ADD_PROPERTY(PropertyInfo(Variant::PACKED_FLOAT32_ARRAY, "beat"), "set_beat", "get_beat");
+    ADD_PROPERTY(PropertyInfo(Variant::PACKED_FLOAT32_ARRAY, "bpm"), "set_bpm", "get_bpm");
     ADD_PROPERTY(PropertyInfo(Variant::PACKED_BYTE_ARRAY, "type"), "set_type", "get_type");
     ADD_PROPERTY(PropertyInfo(Variant::PACKED_BYTE_ARRAY, "channel"), "set_channel", "get_channel");
     ADD_PROPERTY(PropertyInfo(Variant::PACKED_BYTE_ARRAY, "arg0"), "set_arg0", "get_arg0");
@@ -44,9 +44,9 @@ void Midi::set_time(const PackedFloat32Array &p_time) { time = p_time; }
 
 PackedFloat32Array Midi::get_time() const { return time; }
 
-void Midi::set_beat(const PackedFloat32Array &p_beat) { beat = p_beat; }
+void Midi::set_bpm(const PackedFloat32Array &p_bpm) { bpm = p_bpm; }
 
-PackedFloat32Array Midi::get_beat() const { return beat; }
+PackedFloat32Array Midi::get_bpm() const { return bpm; }
 
 void Midi::set_type(const PackedByteArray &p_type) { type = p_type; }
 
@@ -123,28 +123,22 @@ Error MidiImportPlugin::_import(const String &source_file,
     int size = tml_get_info(parsed, nullptr, nullptr, nullptr, nullptr, nullptr);
 
     PackedFloat32Array time;
-    PackedFloat32Array beat;
+    PackedFloat32Array bpm;
     PackedByteArray type;
     PackedByteArray channel;
     PackedByteArray arg0;
     PackedByteArray arg1;
     time.resize(size);
-    beat.resize(size);
+    bpm.resize(size);
     type.resize(size);
     channel.resize(size);
     arg0.resize(size);
     arg1.resize(size);
     tml_message *pos = parsed;
-    double current_time = 0.0;
     double current_bpm = 120.0;
-    double current_beat = 0.0;
     for (int i = 0; i < size; i++) {
         double t = (pos->time) / 1000.0f;
         time[i] = t;
-        // Update beat position by using time delta and current tempo
-        current_beat += (t - current_time) * current_bpm / 60.0;
-        current_time = t;
-        beat[i] = UtilityFunctions::snappedf(current_beat, 1.0/256.0);
         type[i] = pos->type;
         channel[i] = pos->channel;
         arg0[i] = pos->key;
@@ -154,10 +148,11 @@ Error MidiImportPlugin::_import(const String &source_file,
             double microseconds_per_beat = static_cast<uint8_t>(channel[i]) * 65536 + static_cast<uint8_t>(arg0[i]) * 256 + static_cast<uint8_t>(arg1[i]);
             current_bpm = 60e6 / microseconds_per_beat;
         }
+        bpm[i] = current_bpm;
         pos = pos->next;
     }
     sf->set_time(time);
-    sf->set_beat(beat);
+    sf->set_bpm(bpm);
     sf->set_type(type);
     sf->set_channel(channel);
     sf->set_arg0(arg0);

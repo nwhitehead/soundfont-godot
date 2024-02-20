@@ -16,9 +16,12 @@ var arppos = -1
 var oldtime = 0
 
 var time = 0
+var old_ptime = 0
 var song
 var song_time = 0
 var song_position = 0
+var current_bpm = 120.0
+var current_beat = 0
 
 func _ready():
 	song = ResourceLoader.load('res://1080-c01.mid')
@@ -33,6 +36,11 @@ func _ready():
 
 func _process(delta):
 	var ptime = player.get_time()
+	var delta_ptime = ptime - old_ptime
+	current_beat += delta_ptime * current_bpm / 60
+	old_ptime = ptime
+	var subbeat = current_beat - int(current_beat)
+	print(subbeat)
 	var dur = 0.171
 	var end_time = ptime + 1.0 / Engine.get_physics_ticks_per_second() + 0.1
 	while time < end_time:
@@ -63,6 +71,7 @@ func _process(delta):
 		var channel = song.get_channel()[song_position]
 		var key = song.get_arg0()[song_position]
 		var vel = song.get_arg1()[song_position] / 255.0
+		current_bpm = song.get_bpm()[song_position]
 		song_position += 1
 		if type == Midi.NOTE_ON:
 			if play_song:

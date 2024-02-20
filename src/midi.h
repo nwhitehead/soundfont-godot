@@ -13,13 +13,6 @@
 
 namespace godot {
 
-struct MidiEvent {
-    double time;
-    TMLMessageType type;
-    int channel;
-    int8_t dataA, dataB;
-};
-
 /// A resource that represents the MIDI file contents, in parsed form
 // General idea is structure-of-arrays format, so we can use PackedByteArray
 class Midi : public Resource {
@@ -27,7 +20,7 @@ class Midi : public Resource {
     GDCLASS(Midi, Resource)
 private:
     PackedFloat32Array time;
-    PackedFloat32Array beat;
+    PackedFloat32Array bpm;
     PackedByteArray type;
     PackedByteArray channel;
     PackedByteArray arg0;
@@ -52,8 +45,8 @@ public:
 
     void set_time(const PackedFloat32Array &time);
     PackedFloat32Array get_time() const;
-    void set_beat(const PackedFloat32Array &time);
-    PackedFloat32Array get_beat() const;
+    void set_bpm(const PackedFloat32Array &bpm);
+    PackedFloat32Array get_bpm() const;
     void set_type(const PackedByteArray &type);
     PackedByteArray get_type() const;
     void set_channel(const PackedByteArray &channel);
