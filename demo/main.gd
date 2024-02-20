@@ -1,7 +1,7 @@
 extends Node2D
 
 var play_arp: bool = false
-var play_drums: bool = false
+var play_drums: bool = true
 var play_song: bool = true
 var preset: int = 27 # 25
 var drum_kit: int = 20
@@ -12,7 +12,7 @@ var player: SoundFontPlayer = null
 var base_note: int = 44
 var arpnotes = [0, 4, 7, 12]
 var arpseq = [0, 1, 2, 3, 2, 1, 0, 1]
-var arppos = -1
+var arppos = 0
 var oldtime = 0
 
 var time = 0
@@ -20,19 +20,26 @@ var old_ptime = 0
 var song
 var song_time = 0
 var song_position = 0
-var current_bpm = 120.0
+var current_bpm = 115.0
 var current_beat = 0
+var beat_marker_sprite = null
 
 func _ready():
 	song = ResourceLoader.load('res://1080-c01.mid')
 	player = $SoundFontPlayer
+	beat_marker_sprite = $BeatMarker/BeatMarkerSprite
 	print("sf2 preset: ", player.get_presetname(preset))
 	player.channel_set_presetnumber(0, 1, drum_kit, true)
 	player.channel_set_presetnumber(0, 2, preset, false)
-	player.channel_set_presetnumber(0, 3, 41, false)
-	player.channel_set_presetnumber(0, 4, 42, false)
-	player.channel_set_presetnumber(0, 5, 43, false)
-	player.channel_set_presetnumber(0, 6, 44, false)
+	# Violin / viola / cello / bass is 41 42 43 44
+	player.channel_set_presetnumber(0, 3, 0, false)
+	player.channel_set_presetnumber(0, 4, 0, false)
+	player.channel_set_presetnumber(0, 5, 0, false)
+	player.channel_set_presetnumber(0, 6, 0, false)
+
+func bounce(x):
+	var y = 2.0 * x - 1.0 # 1 - y * y
+	return 1 - y * y
 
 func _process(delta):
 	var ptime = player.get_time()
@@ -40,8 +47,8 @@ func _process(delta):
 	current_beat += delta_ptime * current_bpm / 60
 	old_ptime = ptime
 	var subbeat = current_beat - int(current_beat)
-	print(subbeat)
-	var dur = 0.171
+	beat_marker_sprite.position.x = bounce(subbeat) * 200
+	var dur = 60.0 / current_bpm / 4.0
 	var end_time = ptime + 1.0 / Engine.get_physics_ticks_per_second() + 0.1
 	while time < end_time:
 		if play_arp:
@@ -52,7 +59,6 @@ func _process(delta):
 			if arppos == 0:
 				player.channel_note_on(time, 1, preset_drum, 1.0)
 				player.channel_note_off(time + dur / 2, 1, preset_drum)
-				print("num_voices=", player.get_active_voice_count())
 			else:
 				if arppos == 4:
 					player.channel_note_on(time, 1, preset_snare, 1.0)

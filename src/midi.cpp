@@ -120,8 +120,11 @@ Error MidiImportPlugin::_import(const String &source_file,
     sf.instantiate();
     // Parse contents using TML
     tml_message *parsed = tml_load_memory(data.ptr(), data.size());
+    if (!parsed) {
+        UtilityFunctions::printerr("Could not parse MIDI file");
+        return Error::ERR_FILE_CORRUPT;
+    }
     int size = tml_get_info(parsed, nullptr, nullptr, nullptr, nullptr, nullptr);
-
     PackedFloat32Array time;
     PackedFloat32Array bpm;
     PackedByteArray type;
@@ -145,7 +148,7 @@ Error MidiImportPlugin::_import(const String &source_file,
         arg1[i] = pos->velocity;
         // Update bpm on tempo change
         if (type[i] == TML_SET_TEMPO) {
-            double microseconds_per_beat = static_cast<uint8_t>(channel[i]) * 65536 + static_cast<uint8_t>(arg0[i]) * 256 + static_cast<uint8_t>(arg1[i]);
+            double microseconds_per_beat = tml_get_tempo_value(pos);
             current_bpm = 60e6 / microseconds_per_beat;
         }
         bpm[i] = current_bpm;
