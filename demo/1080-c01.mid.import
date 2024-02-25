@@ -1,0 +1,14 @@
+[remap]
+
+importer="Simple MIDI importer"
+type="Midi"
+uid="uid://cm8orycltvabp"
+path="res://.godot/imported/1080-c01.mid-cb07b0c49148dd9b3317efccfc9b9d5f.res"
+
+[deps]
+
+source_file="res://1080-c01.mid"
+dest_files=["res://.godot/imported/1080-c01.mid-cb07b0c49148dd9b3317efccfc9b9d5f.res"]
+
+[params]
+

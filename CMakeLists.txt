@@ -73,18 +73,12 @@ add_custom_command(
             ${BUILD_OUTPUT_DIR}/icons
 )
 
-# Copy demo project
-add_custom_command(
-    TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_SOURCE_DIR}/demo"
-            "${PROJECT_BINARY_DIR}/demo"
-)
+# Install into addons of demo project
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${BUILD_OUTPUT_DIR}"
-            "${PROJECT_BINARY_DIR}/demo/addons/${PROJECT_NAME}"
+            "${PROJECT_SOURCE_DIR}/demo/addons/${PROJECT_NAME}"
 )
 
 add_subdirectory( src )

@@ -17,16 +17,17 @@ void SoundFontImportPlugin::_bind_methods() {
 PackedStringArray SoundFontImportPlugin::_get_recognized_extensions() {
     PackedStringArray result{};
     result.append("sf2");
+    result.append("sf3");
     result.append("sfo");
     return result;
 }
 
 String SoundFontImportPlugin::_get_importer_name() {
-    return "SoundFont2";
+    return "SoundFont";
 }
 
 String SoundFontImportPlugin::_get_visible_name() {
-    return "SoundFont2";
+    return "SoundFont";
 }
 
 String SoundFontImportPlugin::_get_resource_type() {

@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://dfhsqj7og2fgr"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_526j8"]
-[ext_resource type="SoundFont" uid="uid://dygeiorcyb203" path="res://FluidR3_GM.sf2" id="2_gn1yg"]
+[ext_resource type="SoundFont" uid="uid://bw3y65shd3ae4" path="res://example.sf2" id="2_0fi5t"]
 
 [sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_ckiyt"]
 buffer_length = 0.1
@@ -12,7 +12,7 @@ buffer_length = 0.1
 script = ExtResource("1_526j8")
 
 [node name="SoundFontPlayer" type="SoundFontPlayer" parent="."]
-soundfont = ExtResource("2_gn1yg")
+soundfont = ExtResource("2_0fi5t")
 gain = -4.4
 max_voices = 64
 stream = SubResource("AudioStreamGenerator_ckiyt")
