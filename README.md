@@ -6,11 +6,11 @@ instruments and notes programmatically during gameplay.
 
 Some reasons you might want to do this:
 
--   Precise control of rhythm and timing of musical events in game
--   Retro MIDI music aesthetic
--   Change rhythm, pitches, harmony of game music based on gameplay events
--   General procedural music generation
--   Create music composing tools
+-   You need precise control of rhythm and timing of musical events in game
+-   You want a retro MIDI music aesthetic
+-   To change rhythm, pitches, harmony of game music based on gameplay events
+-   You want to do general procedural music generation
+-   To create music composing tools
 
 Features of this extension:
 
@@ -61,7 +61,7 @@ The `SoundFontPlayer` has properties:
 -   `gain` which determines total volume, in dB.
 -   `max_voices` which determines how many simultaneous voices can be played
     (multiple voices may be used for 1 instrument note).
--   `goal_available` which is a ratio of how much buffer the extension will try
+-   `goal_available_ratio` which is a ratio of how much buffer the extension will try
     to keep unused.
 
 To get a note to play, you need create a `SoundFontPlayer` node and setup the
@@ -85,7 +85,7 @@ audio that has already been pushed to the audio driver call
 `time` of this time or lower will happen as soon as possible at the beginning of
 the next audio callback. Method calls that give `time` higher than this value
 will be scheduled for that audio position. These events can be within the time
-of the next audio callback and should be handled correctly within one audio
+of the next audio callback and should be handled correctly to within one audio
 sample.
 
 ## Latency
@@ -96,22 +96,23 @@ latency audio response it is recommended that you keep the physics framerate at
 60 FPS.
 
 Audio generation is also buffered by the buffer in `SoundFontPlayer` in the
-`AudioStreamPlayer` stream. The `stream` is a `Generator` that has a `Buffer
-Length`. This should be set high enough to prevent audio underruns and glitches.
-To avoid high latency, avoid setting this buffer too big.
+`AudioStreamPlayer` stream. The `stream` is a `Generator` that has a
+`buffer_length`. This should be set high enough to prevent audio underruns and
+glitches. To avoid high latency, avoid setting this buffer too big. The
+default value for the buffer length is `0.1s`.
 
 The audio buffer is filled to some ratio by `SoundFontPlayer`, set by
-`goal_available`. A zero value for `goal_available` will aim to fill the audio
-buffer completely. This means if the buffer is `0.1s` and it is filled
+`goal_available_ratio`. A zero value for `goal_available_ratio` will aim to fill
+the audio buffer completely. This means if the buffer is `0.1s` and it is filled
 completely, there will be at least `0.1s` of latency due to the buffering. A
-high value of `goal_available` will attempt to leave most of the buffer unused.
-So if `goal_available` is `0.8` and the buffer is `0.1s` then the audio
-generator will try to use only about `0.02s` of the buffer.
+high value of `goal_available_ratio` will attempt to leave most of the buffer
+unused. So if `goal_available_ratio` is `0.8` and the buffer is `0.1s` then the
+audio generator will try to use only about `0.02s` of the buffer.
 
 To get low latency that will avoid audio glitching most of the time it is
-recommended to set `goal_available` to a ratio that leaves at least `0.02s`
-of buffer available. For the default `0.1s` buffer this means leaving
-`goal_available` at `0.8` or lower.
+recommended to set `goal_available_ratio` to a ratio that leaves at least
+`0.02s` of buffer available. For the default `0.1s` buffer this means leaving
+`goal_available_ratio` at `0.8` or lower.
 
 ## Scheduling Events
 

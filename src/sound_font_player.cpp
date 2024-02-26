@@ -21,6 +21,7 @@ SoundFontPlayer::SoundFontPlayer() {
     // Set reasonable snappy default latency
     genstream->set_buffer_length(0.1 /* seconds */);
     set_stream(genstream);
+    UtilityFunctions::print("get_stream()=", get_stream());
     generator = nullptr;
     // Start with quiet gain, for mixing 4 voices at 0 dB
     // Actual required gain depends on sf2 levels.
@@ -32,6 +33,7 @@ SoundFontPlayer::SoundFontPlayer() {
     goal_available_ratio = 0.8f;
     max_samples_available = 0;
     process_count = 0;
+    notify_property_list_changed();
 }
 
 SoundFontPlayer::~SoundFontPlayer() {
@@ -46,6 +48,7 @@ void SoundFontPlayer::setup_generator() {
     Ref<AudioStreamGenerator> stream = get_stream();
     if (generator && stream.is_valid()) {
         int mix_rate = stream->get_mix_rate();
+        UtilityFunctions::print("gain=", get_gain(), " stream=", stream, " mix_rate=", mix_rate);
         tsf_set_output(generator, TSF_STEREO_INTERLEAVED, mix_rate, gain);
         tsf_set_max_voices(generator, std::max(max_voices, 1));
     }

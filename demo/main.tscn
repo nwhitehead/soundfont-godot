@@ -3,8 +3,8 @@
 [ext_resource type="Script" path="res://main.gd" id="1_526j8"]
 [ext_resource type="SoundFont" uid="uid://bw3y65shd3ae4" path="res://example.sf2" id="2_0fi5t"]
 
-[sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_ckiyt"]
-buffer_length = 0.1
+[sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_2uuae"]
+mix_rate = 22050.0
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_q4k5w"]
 
@@ -13,9 +13,9 @@ script = ExtResource("1_526j8")
 
 [node name="SoundFontPlayer" type="SoundFontPlayer" parent="."]
 soundfont = ExtResource("2_0fi5t")
-gain = -4.4
+gain = -11.9
 max_voices = 64
-stream = SubResource("AudioStreamGenerator_ckiyt")
+stream = SubResource("AudioStreamGenerator_2uuae")
 
 [node name="ButtonG" type="Button" parent="."]
 offset_left = 235.0
