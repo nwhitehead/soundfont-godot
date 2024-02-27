@@ -70,7 +70,7 @@ public:
     void channel_note_on(double time, int channel, int key, float velocity);
     void channel_note_off(double time, int channel, int key);
 
-    void _physics_process();
+    void _process(double delta);
 };
 
 

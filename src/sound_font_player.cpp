@@ -268,8 +268,7 @@ PackedVector2Array SoundFontPlayer::render(int samples) {
     return result;
 }
 
-void SoundFontPlayer::_physics_process() {
-    double delta = 1.0 / Engine::get_singleton()->get_physics_ticks_per_second();
+void SoundFontPlayer::_process(double delta) {
     if (Engine::get_singleton()->is_editor_hint()) {
         // In editor, don't play SoundFont audio data
         // Also reset max_samples_available in case the buffer settings are modified
@@ -303,7 +302,7 @@ void SoundFontPlayer::_physics_process() {
     int samples = ideal_samples + (available - goal_available) / 32;
     // If buffer is almost full, never overfill (cut down samples with min)
     samples = std::max(std::min(samples, available), 0);
-    UtilityFunctions::printerr("SoundFontPlayer::_physics_process() samples=", samples, " ideal_samples=", ideal_samples, " available=", available, " physics_ticks_per_second=", Engine::get_singleton()->get_physics_ticks_per_second());
+    UtilityFunctions::printerr("SoundFontPlayer::_process() samples=", samples, " ideal_samples=", ideal_samples, " available=", available, " physics_ticks_per_second=", Engine::get_singleton()->get_physics_ticks_per_second());
     if (!samples) {
         // Nothing to render
         return;
@@ -380,5 +379,5 @@ void SoundFontPlayer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("channel_note_on", "time", "channel", "key", "velocity"), &SoundFontPlayer::channel_note_on);
     ClassDB::bind_method(D_METHOD("channel_note_off", "time", "channel", "key"), &SoundFontPlayer::channel_note_off);
 
-    ClassDB::bind_method(D_METHOD("physics_process"), &SoundFontPlayer::_physics_process);
+    ClassDB::bind_method(D_METHOD("process", "delta"), &SoundFontPlayer::_process);
 }
