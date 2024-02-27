@@ -27,10 +27,6 @@ var beat_marker_sprite = null
 func _ready():
 	song = ResourceLoader.load('res://1080-c01.mid')
 	player = $SoundFontPlayer
-	print(player)
-	print(player.get_gain())
-	print(player.get_stream())
-	print(player.get_stream().get_mix_rate())
 	beat_marker_sprite = $BeatMarker/BeatMarkerSprite
 	print("sf2 preset: ", player.get_presetname(preset))
 	player.channel_set_presetnumber(0, 1, drum_kit, true)

@@ -1,19 +1,21 @@
-[gd_scene load_steps=5 format=3 uid="uid://dfhsqj7og2fgr"]
+[gd_scene load_steps=6 format=3 uid="uid://dfhsqj7og2fgr"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_526j8"]
-[ext_resource type="SoundFont" uid="uid://bw3y65shd3ae4" path="res://example.sf2" id="2_0fi5t"]
+[ext_resource type="SoundFont" uid="uid://bw3y65shd3ae4" path="res://example.sf2" id="2_lbiaj"]
+[ext_resource type="AudioStream" uid="uid://cfng4msm61pmk" path="res://bensound-tombeaudevivaldi.mp3" id="3_8fnfw"]
 
 [sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_2uuae"]
-mix_rate = 22050.0
+buffer_length = 1.0
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_q4k5w"]
 
 [node name="Main" type="Node2D"]
+process_mode = 1
 script = ExtResource("1_526j8")
 
 [node name="SoundFontPlayer" type="SoundFontPlayer" parent="."]
-soundfont = ExtResource("2_0fi5t")
-gain = -11.9
+soundfont = ExtResource("2_lbiaj")
+gain = -11.7
 max_voices = 64
 stream = SubResource("AudioStreamGenerator_2uuae")
 
@@ -66,6 +68,10 @@ position = Vector2(146, 314)
 [node name="BeatMarkerSprite" type="Sprite2D" parent="BeatMarker"]
 scale = Vector2(34.375, 37.125)
 texture = SubResource("PlaceholderTexture2D_q4k5w")
+
+[node name="BGMusic" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_8fnfw")
+autoplay = true
 
 [connection signal="button_down" from="ButtonG" to="." method="_on_button_button_down_g"]
 [connection signal="button_down" from="ButtonC" to="." method="_on_button_button_down_c"]

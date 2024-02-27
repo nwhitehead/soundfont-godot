@@ -27,6 +27,9 @@ private:
     int max_samples_available;
     int process_count;
     Vector<Event> events;
+    int configured_mix_rate;
+    int configured_max_voices;
+    float configured_gain;
 
 protected:
     static void _bind_methods();

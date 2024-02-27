@@ -7,6 +7,8 @@
 #include <godot_cpp/classes/audio_stream_generator.hpp>
 #include <godot_cpp/classes/audio_stream_generator_playback.hpp>
 
+#include <cmath>
+
 // Include support for OGG Vorbis file format (detected automatically by TinySoundFont header)
 #include "stb/stb_vorbis.c"
 
@@ -15,13 +17,14 @@
 
 using namespace godot;
 
+constexpr int ABSOLUTE_MAX_VOICES = 4096;
+
 SoundFontPlayer::SoundFontPlayer() {
     Ref<AudioStreamGenerator> genstream;
     genstream.instantiate();
     // Set reasonable snappy default latency
     genstream->set_buffer_length(0.1 /* seconds */);
     set_stream(genstream);
-    UtilityFunctions::print("get_stream()=", get_stream());
     generator = nullptr;
     // Start with quiet gain, for mixing 4 voices at 0 dB
     // Actual required gain depends on sf2 levels.
@@ -33,7 +36,9 @@ SoundFontPlayer::SoundFontPlayer() {
     goal_available_ratio = 0.8f;
     max_samples_available = 0;
     process_count = 0;
-    notify_property_list_changed();
+    configured_mix_rate = 0;
+    configured_max_voices = 0;
+    configured_gain = std::nanf("");
 }
 
 SoundFontPlayer::~SoundFontPlayer() {
@@ -48,9 +53,16 @@ void SoundFontPlayer::setup_generator() {
     Ref<AudioStreamGenerator> stream = get_stream();
     if (generator && stream.is_valid()) {
         int mix_rate = stream->get_mix_rate();
-        UtilityFunctions::print("gain=", get_gain(), " stream=", stream, " mix_rate=", mix_rate);
-        tsf_set_output(generator, TSF_STEREO_INTERLEAVED, mix_rate, gain);
-        tsf_set_max_voices(generator, std::max(max_voices, 1));
+        if (configured_mix_rate != mix_rate && configured_gain != gain) {
+            configured_mix_rate = mix_rate;
+            configured_gain = gain;
+            tsf_set_output(generator, TSF_STEREO_INTERLEAVED, mix_rate, gain);
+        }
+        max_voices = CLAMP(max_voices, 1, ABSOLUTE_MAX_VOICES);
+        if (configured_max_voices != max_voices) {
+            configured_max_voices = max_voices;
+            tsf_set_max_voices(generator, max_voices);
+        }
     }
 }
 
@@ -246,6 +258,7 @@ void SoundFontPlayer::do_event(const Event &event) {
 
 PackedVector2Array SoundFontPlayer::render(int samples) {
     PackedVector2Array result{};
+    setup_generator();
     if (!generator) {
         UtilityFunctions::printerr("No SoundFont loaded in SoundFontPlayer");
         return result;
@@ -290,6 +303,7 @@ void SoundFontPlayer::_physics_process() {
     int samples = ideal_samples + (available - goal_available) / 32;
     // If buffer is almost full, never overfill (cut down samples with min)
     samples = std::max(std::min(samples, available), 0);
+    UtilityFunctions::printerr("SoundFontPlayer::_physics_process() samples=", samples, " ideal_samples=", ideal_samples, " available=", available, " physics_ticks_per_second=", Engine::get_singleton()->get_physics_ticks_per_second());
     if (!samples) {
         // Nothing to render
         return;
