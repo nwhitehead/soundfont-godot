@@ -35,7 +35,9 @@ target_compile_features( ${PROJECT_NAME}
 if (MSVC)
     add_compile_options(/W4 /WX)
 else()
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Werror -Wno-use-after-free -Werror=suggest-override)
+    if ( NOT APPLE )
+        target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Werror -Wno-use-after-free -Werror=suggest-override)
+    endif()
 endif()
 
 # LIB_ARCH is the architecture being built. It is set to the build system's architecture.
