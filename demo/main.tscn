@@ -5,7 +5,7 @@
 [ext_resource type="AudioStream" uid="uid://cfng4msm61pmk" path="res://bensound-tombeaudevivaldi.mp3" id="3_8fnfw"]
 
 [sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_2uuae"]
-buffer_length = 1.0
+buffer_length = 0.1
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_q4k5w"]
 
@@ -17,7 +17,7 @@ script = ExtResource("1_526j8")
 soundfont = ExtResource("2_lbiaj")
 gain = -11.7
 max_voices = 64
-goal_available_ratio = 0.77
+goal_available_ratio = 0.87
 stream = SubResource("AudioStreamGenerator_2uuae")
 
 [node name="ButtonG" type="Button" parent="."]
