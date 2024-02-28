@@ -3,3 +3,4 @@ demo/.godot/
 demo/addons/
 build/
 .vscode/
+cache/

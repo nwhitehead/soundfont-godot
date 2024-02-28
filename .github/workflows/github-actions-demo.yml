@@ -8,8 +8,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        build_type: [Release, Debug]
+        # os: [ubuntu-latest, windows-latest]
+        # build_type: [Release, Debug]
+        os: [ubuntu-latest]
+        build_type: [Debug]
 
     steps:
 
@@ -26,9 +28,24 @@ jobs:
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DFETCHCONTENT_BASE_DIR=${{ github.workspace }}/cache
         -S ${{ github.workspace }}
+
+    - name: Use cache for godot-cpp build if available
+      uses: actions/cache@v3
+      with:
+        path: cache
+        key: ${{ runner.os }}.${{ runner.build_type }}.tests.${{ hashFiles('**/') }}
+        restore-keys: ${{ runner.os }}.${{ runner.build_type }}.tests.
 
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: |
+          ${{ steps.strings.outputs.build-output-dir }}/soundfont-gdextension
 
     - run: echo "🍏 This job's status is ${{ job.status }}."
