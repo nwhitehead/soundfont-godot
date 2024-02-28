@@ -14,10 +14,6 @@ config/name="Projects"
 run/main_scene="res://main.tscn"
 config/features=PackedStringArray("4.2", "Mobile")
 
-[display]
-
-window/vsync/vsync_mode=3
-
 [input]
 
 note_c={

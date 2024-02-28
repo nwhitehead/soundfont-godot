@@ -1,54 +1,45 @@
-[gd_scene load_steps=6 format=3 uid="uid://dfhsqj7og2fgr"]
+[gd_scene load_steps=5 format=3 uid="uid://dfhsqj7og2fgr"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_526j8"]
-[ext_resource type="SoundFont" uid="uid://bw3y65shd3ae4" path="res://example.sf2" id="2_lbiaj"]
-[ext_resource type="AudioStream" uid="uid://cfng4msm61pmk" path="res://bensound-tombeaudevivaldi.mp3" id="3_8fnfw"]
+[ext_resource type="SoundFont" uid="uid://r8eesc4mlthp" path="res://florestan-subset.sfo" id="2_jsvn0"]
 
 [sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_2uuae"]
 buffer_length = 0.1
 
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_q4k5w"]
+[sub_resource type="Theme" id="Theme_meswg"]
+default_font_size = 18
 
 [node name="Main" type="Node2D"]
 process_mode = 1
 script = ExtResource("1_526j8")
 
 [node name="SoundFontPlayer" type="SoundFontPlayer" parent="."]
-soundfont = ExtResource("2_lbiaj")
-gain = -11.7
+soundfont = ExtResource("2_jsvn0")
+gain = 0.0
 max_voices = 64
-goal_available_ratio = 0.87
+goal_available_ratio = 0.5
 stream = SubResource("AudioStreamGenerator_2uuae")
 
 [node name="ButtonG" type="Button" parent="."]
-offset_left = 235.0
-offset_top = 198.0
-offset_right = 296.0
-offset_bottom = 241.0
-text = "G"
+offset_left = 208.0
+offset_top = 152.0
+offset_right = 272.0
+offset_bottom = 192.0
+text = "A7"
 
 [node name="ButtonC" type="Button" parent="."]
-offset_left = 141.0
-offset_top = 202.0
-offset_right = 203.0
-offset_bottom = 241.0
-text = "C"
+offset_left = 128.0
+offset_top = 152.0
+offset_right = 192.0
+offset_bottom = 192.0
+text = "Dm"
 
 [node name="ArpToggle" type="CheckButton" parent="."]
-offset_left = 138.0
-offset_top = 54.0
-offset_right = 301.0
-offset_bottom = 86.0
+offset_left = 128.0
+offset_top = 96.0
+offset_right = 280.0
+offset_bottom = 128.0
 text = "Arpeggiator"
-
-[node name="DrumToggle" type="CheckButton" parent="."]
-offset_left = 139.0
-offset_top = 99.0
-offset_right = 303.0
-offset_bottom = 130.0
-button_pressed = true
-text = "Drums
-"
 
 [node name="SongToggle" type="CheckButton" parent="."]
 anchors_preset = -1
@@ -56,26 +47,53 @@ anchor_left = -0.853
 anchor_top = -3.11
 anchor_right = -0.853
 anchor_bottom = -3.11
-offset_left = 143.0
-offset_top = 140.0
-offset_right = 303.0
-offset_bottom = 171.0
-button_pressed = true
+offset_left = 128.0
+offset_top = 64.0
+offset_right = 280.0
+offset_bottom = 95.0
 text = "Song"
 
-[node name="BeatMarker" type="Node2D" parent="."]
-position = Vector2(146, 314)
+[node name="CurrentBPM" type="TextEdit" parent="."]
+offset_left = 384.0
+offset_top = 88.0
+offset_right = 512.0
+offset_bottom = 128.0
+editable = false
 
-[node name="BeatMarkerSprite" type="Sprite2D" parent="BeatMarker"]
-scale = Vector2(34.375, 37.125)
-texture = SubResource("PlaceholderTexture2D_q4k5w")
+[node name="Beat" type="TextEdit" parent="."]
+offset_left = 384.0
+offset_top = 176.0
+offset_right = 512.0
+offset_bottom = 216.0
+editable = false
 
-[node name="BGMusic" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("3_8fnfw")
-autoplay = true
+[node name="CurrentBPMLabel" type="Label" parent="."]
+offset_left = 384.0
+offset_top = 64.0
+offset_right = 484.0
+offset_bottom = 87.0
+text = "Current BPM"
+
+[node name="BeatLabel" type="Label" parent="."]
+offset_left = 384.0
+offset_top = 152.0
+offset_right = 426.0
+offset_bottom = 175.0
+text = "Beat
+"
+
+[node name="Label" type="Label" parent="."]
+offset_left = 128.0
+offset_top = 256.0
+offset_right = 512.0
+offset_bottom = 376.0
+theme = SubResource("Theme_meswg")
+text = "Press keys for piano:
+
+A  S  D  F  G  H  J  K  L"
+horizontal_alignment = 1
 
 [connection signal="button_down" from="ButtonG" to="." method="_on_button_button_down_g"]
 [connection signal="button_down" from="ButtonC" to="." method="_on_button_button_down_c"]
 [connection signal="toggled" from="ArpToggle" to="." method="_on_arp_toggle_toggled"]
-[connection signal="toggled" from="DrumToggle" to="." method="_on_drum_toggle_toggled"]
 [connection signal="toggled" from="SongToggle" to="." method="_on_song_toggle_toggled"]

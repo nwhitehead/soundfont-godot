@@ -53,7 +53,7 @@ void SoundFontPlayer::setup_generator() {
     Ref<AudioStreamGenerator> stream = get_stream();
     if (generator && stream.is_valid()) {
         int mix_rate = stream->get_mix_rate();
-        if (configured_mix_rate != mix_rate && configured_gain != gain) {
+        if (configured_mix_rate != mix_rate || configured_gain != gain) {
             configured_mix_rate = mix_rate;
             configured_gain = gain;
             tsf_set_output(generator, TSF_STEREO_INTERLEAVED, mix_rate, gain);
@@ -75,7 +75,7 @@ void SoundFontPlayer::set_soundfont(Ref<SoundFont> p_soundfont) {
     if (soundfont.is_valid() && soundfont->get_data().size()) {
         generator = tsf_load_memory(soundfont->get_data().ptr(), soundfont->get_data().size());
         if (!generator) {
-            UtilityFunctions::printerr("Error parsing SF2 resource inside SoundFontPlayer");
+            UtilityFunctions::printerr("Error parsing SoundFont resource inside SoundFontPlayer");
         }
     }
     setup_generator();
@@ -303,12 +303,10 @@ void SoundFontPlayer::_physics_process() {
     int samples = ideal_samples + (available - goal_available) / 32;
     // If buffer is almost full, never overfill (cut down samples with min)
     samples = std::max(std::min(samples, available), 0);
-    UtilityFunctions::printerr("SoundFontPlayer::_physics_process() samples=", samples, " ideal_samples=", ideal_samples, " available=", available, " physics_ticks_per_second=", Engine::get_singleton()->get_physics_ticks_per_second());
     if (!samples) {
         // Nothing to render
         return;
     }
-    //UtilityFunctions::print("SoundFontPlayer samples=", samples, " events=", events.size());
     int rendered_samples = 0;
     int loop_count = 0;
     int loop_limit = 256;
@@ -316,7 +314,7 @@ void SoundFontPlayer::_physics_process() {
         // First make sure we are not stuck in infinite loop
         loop_count++;
         if (loop_count > loop_limit) {
-            UtilityFunctions::print("SoundFontPlayer too many iteration in main processing loop, aborting");
+            UtilityFunctions::printerr("SoundFontPlayer too many iteration in main processing loop, aborting");
             break;
         }
         // Events must be sorted by time (earliest first)
@@ -359,7 +357,7 @@ void SoundFontPlayer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_goal_available_ratio", "goal_available_ratio"), &SoundFontPlayer::set_goal_available_ratio);
     ClassDB::bind_method(D_METHOD("get_goal_available_ratio"), &SoundFontPlayer::get_goal_available_ratio);
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "soundfont", PROPERTY_HINT_RESOURCE_TYPE, "SoundFont"), "set_soundfont", "get_soundfont");
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "gain", PROPERTY_HINT_RANGE, "-48.0,12.0,0.1,suffix:dB"), "set_gain", "get_gain");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "gain", PROPERTY_HINT_RANGE, "-48.0,48.0,0.1,suffix:dB"), "set_gain", "get_gain");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_voices", PROPERTY_HINT_RANGE, "1,1024,1"), "set_max_voices", "get_max_voices");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "goal_available_ratio", PROPERTY_HINT_RANGE, "0.0,1.0,0.01"), "set_goal_available_ratio", "get_goal_available_ratio");
 

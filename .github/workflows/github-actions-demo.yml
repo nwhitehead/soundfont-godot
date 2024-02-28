@@ -1,5 +1,5 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} is compiling SoundFont Godot extension 🚀
+name: CI Build
+run-name: ${{ github.actor }} is building SoundFont Godot extension 🚀
 on: [push]
 jobs:
   build:
@@ -39,11 +39,9 @@ jobs:
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
-    - name: Archive production artifacts
+    - name: Archive
       uses: actions/upload-artifact@v4
       with:
         name: dist.${{ runner.os }}.${{ matrix.build_type }}
         path: |
           ${{ steps.strings.outputs.build-output-dir }}/soundfont-gdextension
-
-    - run: echo "🍏 This job's status is ${{ job.status }}."
