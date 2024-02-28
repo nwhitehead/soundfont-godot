@@ -22,19 +22,21 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
+    - name: Use cache for godot-cpp build if available
+      uses: actions/cache@v4
+      with:
+        path: |
+          cache
+          !cache/gdextension-subbuild/CMakeCache.txt
+        key: ${{ runner.os }}.${{ matrix.build_type }}.tests.${{ hashFiles('**/') }}
+        restore-keys: ${{ runner.os }}.${{ matrix.build_type }}.tests.
+
     - name: Configure CMake
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -DFETCHCONTENT_BASE_DIR=${{ github.workspace }}/cache
         -S ${{ github.workspace }}
-
-    - name: Use cache for godot-cpp build if available
-      uses: actions/cache@v4
-      with:
-        path: cache
-        key: ${{ runner.os }}.${{ matrix.build_type }}.tests.${{ hashFiles('**/') }}
-        restore-keys: ${{ runner.os }}.${{ matrix.build_type }}.tests.
 
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
