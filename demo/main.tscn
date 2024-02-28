@@ -17,6 +17,7 @@ script = ExtResource("1_526j8")
 soundfont = ExtResource("2_lbiaj")
 gain = -11.7
 max_voices = 64
+goal_available_ratio = 0.77
 stream = SubResource("AudioStreamGenerator_2uuae")
 
 [node name="ButtonG" type="Button" parent="."]

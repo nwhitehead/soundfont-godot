@@ -44,6 +44,7 @@ func bounce(x):
 func _process(delta):
 	var ptime = player.get_time()
 	var delta_ptime = ptime - old_ptime
+	print('process delta=', delta, ' delta_ptime=', delta_ptime)
 	current_beat += delta_ptime * current_bpm / 60
 	old_ptime = ptime
 	var subbeat = current_beat - int(current_beat)
