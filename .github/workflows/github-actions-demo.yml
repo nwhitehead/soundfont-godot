@@ -35,8 +35,8 @@ jobs:
       uses: actions/cache@v3
       with:
         path: cache
-        key: ${{ runner.os }}.${{ runner.build_type }}.tests.${{ hashFiles('**/') }}
-        restore-keys: ${{ runner.os }}.${{ runner.build_type }}.tests.
+        key: ${{ runner.os }}.${{ matrix.build_type }}.tests.${{ hashFiles('**/') }}
+        restore-keys: ${{ runner.os }}.${{ matrix.build_type }}.tests.
 
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
