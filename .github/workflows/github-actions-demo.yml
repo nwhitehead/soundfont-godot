@@ -30,7 +30,7 @@ jobs:
         -S ${{ github.workspace }}
 
     - name: Use cache for godot-cpp build if available
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: cache
         key: ${{ runner.os }}.${{ matrix.build_type }}.tests.${{ hashFiles('**/') }}
@@ -42,7 +42,7 @@ jobs:
     - name: Archive production artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: dist
+        name: dist.${{ runner.os }}.${{ matrix.build_type }}
         path: |
           ${{ steps.strings.outputs.build-output-dir }}/soundfont-gdextension
 
