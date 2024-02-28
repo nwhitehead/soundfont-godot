@@ -1,10 +1,12 @@
 
 #include "midi.h"
 
-#include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/classes/editor_plugin_registration.hpp>
 #include <godot_cpp/classes/file_access.hpp>
 #include <godot_cpp/classes/resource_saver.hpp>
+#include <godot_cpp/variant/dictionary.hpp>
+#include <godot_cpp/variant/utility_functions.hpp>
+#include <godot_cpp/variant/variant.hpp>
 
 #define TML_IMPLEMENTATION
 #include "tsf/tml.h"
@@ -12,24 +14,9 @@
 namespace godot {
 
 void Midi::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("set_time", "time"), &Midi::set_time);
-    ClassDB::bind_method(D_METHOD("get_time"), &Midi::get_time);
-    ClassDB::bind_method(D_METHOD("set_bpm", "bpm"), &Midi::set_bpm);
-    ClassDB::bind_method(D_METHOD("get_bpm"), &Midi::get_bpm);
-    ClassDB::bind_method(D_METHOD("set_type", "type"), &Midi::set_type);
-    ClassDB::bind_method(D_METHOD("get_type"), &Midi::get_type);
-    ClassDB::bind_method(D_METHOD("set_channel", "channel"), &Midi::set_channel);
-    ClassDB::bind_method(D_METHOD("get_channel"), &Midi::get_channel);
-    ClassDB::bind_method(D_METHOD("set_arg0", "arg0"), &Midi::set_arg0);
-    ClassDB::bind_method(D_METHOD("get_arg0"), &Midi::get_arg0);
-    ClassDB::bind_method(D_METHOD("set_arg1", "arg1"), &Midi::set_arg1);
-    ClassDB::bind_method(D_METHOD("get_arg1"), &Midi::get_arg1);
-    ADD_PROPERTY(PropertyInfo(Variant::PACKED_FLOAT32_ARRAY, "time"), "set_time", "get_time");
-    ADD_PROPERTY(PropertyInfo(Variant::PACKED_FLOAT32_ARRAY, "bpm"), "set_bpm", "get_bpm");
-    ADD_PROPERTY(PropertyInfo(Variant::PACKED_BYTE_ARRAY, "type"), "set_type", "get_type");
-    ADD_PROPERTY(PropertyInfo(Variant::PACKED_BYTE_ARRAY, "channel"), "set_channel", "get_channel");
-    ADD_PROPERTY(PropertyInfo(Variant::PACKED_BYTE_ARRAY, "arg0"), "set_arg0", "get_arg0");
-    ADD_PROPERTY(PropertyInfo(Variant::PACKED_BYTE_ARRAY, "arg1"), "set_arg1", "get_arg1");
+    ClassDB::bind_method(D_METHOD("set_events", "events"), &Midi::set_events);
+    ClassDB::bind_method(D_METHOD("get_events"), &Midi::get_events);
+    ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "events"), "set_events", "get_events");
     BIND_ENUM_CONSTANT(NOTE_OFF);
     BIND_ENUM_CONSTANT(NOTE_ON);
     BIND_ENUM_CONSTANT(KEY_PRESSURE);
@@ -40,29 +27,10 @@ void Midi::_bind_methods() {
     BIND_ENUM_CONSTANT(SET_TEMPO);
 }
 
-void Midi::set_time(const PackedFloat32Array &p_time) { time = p_time; }
+void Midi::set_events(const Array &p_events) { events = p_events; }
 
-PackedFloat32Array Midi::get_time() const { return time; }
+Array Midi::get_events() const { return events; }
 
-void Midi::set_bpm(const PackedFloat32Array &p_bpm) { bpm = p_bpm; }
-
-PackedFloat32Array Midi::get_bpm() const { return bpm; }
-
-void Midi::set_type(const PackedByteArray &p_type) { type = p_type; }
-
-PackedByteArray Midi::get_type() const { return type; }
-
-void Midi::set_channel(const PackedByteArray &p_channel) { channel = p_channel; }
-
-PackedByteArray Midi::get_channel() const { return channel; }
-
-void Midi::set_arg0(const PackedByteArray &p_arg0) { arg0 = p_arg0; }
-
-PackedByteArray Midi::get_arg0() const { return arg0; }
-
-void Midi::set_arg1(const PackedByteArray &p_arg1) { arg1 = p_arg1; }
-
-PackedByteArray Midi::get_arg1() const { return arg1; }
 
 void MidiImportPlugin::_bind_methods() {
     // No gdscript bindings needed
@@ -124,42 +92,28 @@ Error MidiImportPlugin::_import(const String &source_file,
         UtilityFunctions::printerr("Could not parse MIDI file");
         return Error::ERR_FILE_CORRUPT;
     }
+    Array events{};
     int size = tml_get_info(parsed, nullptr, nullptr, nullptr, nullptr, nullptr);
-    PackedFloat32Array time;
-    PackedFloat32Array bpm;
-    PackedByteArray type;
-    PackedByteArray channel;
-    PackedByteArray arg0;
-    PackedByteArray arg1;
-    time.resize(size);
-    bpm.resize(size);
-    type.resize(size);
-    channel.resize(size);
-    arg0.resize(size);
-    arg1.resize(size);
     tml_message *pos = parsed;
-    double current_bpm = 120.0;
+    double current_bpm = 10.0;
     for (int i = 0; i < size; i++) {
         double t = (pos->time) / 1000.0f;
-        time[i] = t;
-        type[i] = pos->type;
-        channel[i] = pos->channel;
-        arg0[i] = pos->key;
-        arg1[i] = pos->velocity;
+        Dictionary event{};
+        event[Variant("t")] = t;
+        event[Variant("type")] = pos->type;
+        event[Variant("channel")] = pos->channel;
+        event[Variant("key")] = pos->key;
+        event[Variant("velocity")] = pos->velocity;
         // Update bpm on tempo change
-        if (type[i] == TML_SET_TEMPO) {
+        if (pos->type == TML_SET_TEMPO) {
             double microseconds_per_beat = tml_get_tempo_value(pos);
             current_bpm = 60e6 / microseconds_per_beat;
         }
-        bpm[i] = current_bpm;
+        event[Variant("bpm")] = current_bpm;
         pos = pos->next;
+        events.push_back(event);
     }
-    sf->set_time(time);
-    sf->set_bpm(bpm);
-    sf->set_type(type);
-    sf->set_channel(channel);
-    sf->set_arg0(arg0);
-    sf->set_arg1(arg1);
+    sf->set_events(events);
     tml_free(parsed);
     return ResourceSaver::get_singleton()->save(sf, String(save_path) + String(".") + _get_save_extension());
 }

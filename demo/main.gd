@@ -56,20 +56,21 @@ func _process(delta):
 		if arppos >= len(arpseq):
 			arppos = 0			
 
-	while song_position < song.get_time().size() and song.get_time()[song_position] + song_offset < end_time:
-		var t = song.get_time()[song_position] + song_offset
-		var type = song.get_type()[song_position]
-		var channel = song.get_channel()[song_position]
-		var key = song.get_arg0()[song_position]
-		var vel = song.get_arg1()[song_position] / 255.0
-		current_bpm = song.get_bpm()[song_position]
+	while song_position < song.get_events().size() and song.get_events()[song_position]['t'] + song_offset < end_time:
+		var event = song.get_events()[song_position]
+		var t = event['t'] + song_offset
+		var type = event['type']
+		var channel = event['channel']
+		var key = event['key']
+		var vel = event['velocity'] / 255.0
+		current_bpm = event['bpm']
 		$CurrentBPM.text = '%d' % current_bpm
 		song_position += 1
 		if type == Midi.NOTE_ON:
 			if play_song:
 				player.channel_note_on(t, 3 + channel, key, vel)
-	if song_position == song.get_time().size():
-		player.note_off_all(song.get_time()[song_position - 1] + song_offset)
+	if song_position == song.get_events().size() and song_position > 0:
+		player.note_off_all(song.get_events()[song_position - 1][0] + song_offset)
 
 func _on_button_button_down_c():
 	# D F A D

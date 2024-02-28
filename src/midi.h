@@ -3,8 +3,7 @@
 #define MIDI_H
 
 #include <godot_cpp/classes/resource.hpp>
-#include <godot_cpp/variant/packed_float32_array.hpp>
-#include <godot_cpp/variant/packed_byte_array.hpp>
+#include <godot_cpp/variant/array.hpp>
 
 #include <godot_cpp/classes/editor_plugin.hpp>
 #include <godot_cpp/classes/editor_import_plugin.hpp>
@@ -19,12 +18,7 @@ class Midi : public Resource {
 
     GDCLASS(Midi, Resource)
 private:
-    PackedFloat32Array time;
-    PackedFloat32Array bpm;
-    PackedByteArray type;
-    PackedByteArray channel;
-    PackedByteArray arg0;
-    PackedByteArray arg1;
+    Array events;
 
 protected:
     static void _bind_methods();
@@ -43,18 +37,8 @@ public:
         SET_TEMPO = 0x51
     };
 
-    void set_time(const PackedFloat32Array &time);
-    PackedFloat32Array get_time() const;
-    void set_bpm(const PackedFloat32Array &bpm);
-    PackedFloat32Array get_bpm() const;
-    void set_type(const PackedByteArray &type);
-    PackedByteArray get_type() const;
-    void set_channel(const PackedByteArray &channel);
-    PackedByteArray get_channel() const;
-    void set_arg0(const PackedByteArray &arg0);
-    PackedByteArray get_arg0() const;
-    void set_arg1(const PackedByteArray &arg1);
-    PackedByteArray get_arg1() const;
+    void set_events(const Array &time);
+    Array get_events() const;
 };
 
 class MidiImportPlugin : public EditorImportPlugin {
