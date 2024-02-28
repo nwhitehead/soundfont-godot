@@ -203,6 +203,34 @@ void SoundFontPlayer::channel_set_pan(double time, int channel, float pan) {
     add_event(evt);
 }
 
+void SoundFontPlayer::channel_set_volume(double time, int channel, float volume) {
+    Event evt(time, EventType::SET_VOLUME);
+    evt.channel = channel;
+    evt.velocity = volume;
+    add_event(evt);
+}
+
+void SoundFontPlayer::channel_set_pitchwheel(double time, int channel, int pitch_wheel) {
+    Event evt(time, EventType::SET_PITCHWHEEL);
+    evt.channel = channel;
+    evt.velocity = (pitch_wheel - 8192) / 8192.0;
+    add_event(evt);
+}
+
+void SoundFontPlayer::channel_set_pitchrange(double time, int channel, float pitch_range) {
+    Event evt(time, EventType::SET_PITCHRANGE);
+    evt.channel = channel;
+    evt.velocity = pitch_range;
+    add_event(evt);
+}
+
+void SoundFontPlayer::channel_set_tuning(double time, int channel, float tuning) {
+    Event evt(time, EventType::SET_TUNING);
+    evt.channel = channel;
+    evt.velocity = tuning;
+    add_event(evt);
+}
+
 void SoundFontPlayer::channel_note_on(double time, int channel, int key, float velocity) {
     Event evt(time, EventType::NOTE_ON);
     evt.channel = channel;
@@ -252,6 +280,27 @@ void SoundFontPlayer::do_event(const Event &event) {
             break;
         case EventType::SET_PAN:
             tsf_channel_set_pan(generator, event.channel, event.velocity);
+            break;
+        case EventType::SET_VOLUME:
+            tsf_channel_set_volume(generator, event.channel, event.velocity);
+            break;
+        case EventType::SET_PITCHWHEEL:
+            {
+                int pitch_wheel = static_cast<int>((event.velocity * 8192.0f) + 8192.0f);
+                if (pitch_wheel > 16383) {
+                    pitch_wheel = 16383;
+                }
+                tsf_channel_set_pitchwheel(generator, event.channel, pitch_wheel);
+            }
+            break;
+        case EventType::SET_PITCHRANGE:
+            tsf_channel_set_pitchrange(generator, event.channel, event.velocity);
+            break;
+        case EventType::SET_TUNING:
+            tsf_channel_set_tuning(generator, event.channel, event.velocity);
+            break;
+        default:
+            UtilityFunctions::printerr("SoundFontPlayer unknown note event type ", static_cast<int>(event.event_type));
             break;
     }
 }
@@ -375,6 +424,10 @@ void SoundFontPlayer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("channel_set_presetnumber", "time", "channel", "preset_number", "drums"), &SoundFontPlayer::channel_set_presetnumber);
     ClassDB::bind_method(D_METHOD("channel_set_bank", "time", "channel", "bank"), &SoundFontPlayer::channel_set_bank);
     ClassDB::bind_method(D_METHOD("channel_set_pan", "time", "channel", "pan"), &SoundFontPlayer::channel_set_pan);
+    ClassDB::bind_method(D_METHOD("channel_set_volume", "time", "channel", "volume"), &SoundFontPlayer::channel_set_volume);
+    ClassDB::bind_method(D_METHOD("channel_set_pitchwheel", "time", "channel", "pitch_wheel"), &SoundFontPlayer::channel_set_pitchwheel);
+    ClassDB::bind_method(D_METHOD("channel_set_pitchrange", "time", "channel", "pitch_range"), &SoundFontPlayer::channel_set_pitchrange);
+    ClassDB::bind_method(D_METHOD("channel_set_tuning", "time", "channel", "tuning"), &SoundFontPlayer::channel_set_tuning);
     ClassDB::bind_method(D_METHOD("channel_note_on", "time", "channel", "key", "velocity"), &SoundFontPlayer::channel_note_on);
     ClassDB::bind_method(D_METHOD("channel_note_off", "time", "channel", "key"), &SoundFontPlayer::channel_note_off);
 

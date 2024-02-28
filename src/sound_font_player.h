@@ -67,6 +67,10 @@ public:
     void channel_set_presetnumber(double time, int channel, int preset_number, bool drums);
     void channel_set_bank(double time, int channel, int bank);
     void channel_set_pan(double time, int channel, float pan);
+    void channel_set_volume(double time, int channel, float volume);
+    void channel_set_pitchwheel(double time, int channel, int pitch_wheel);
+    void channel_set_pitchrange(double time, int channel, float pitch_range);
+    void channel_set_tuning(double time, int channel, float tuning);
     void channel_note_on(double time, int channel, int key, float velocity);
     void channel_note_off(double time, int channel, int key);
 
