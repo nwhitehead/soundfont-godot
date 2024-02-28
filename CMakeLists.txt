@@ -22,18 +22,21 @@ add_library(${PROJECT_NAME} SHARED)
 
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
+target_link_libraries(${PROJECT_NAME} PUBLIC godot::cpp) 
 if ( "${CMAKE_SYSTEM_NAME}" MATCHES "Windows" )
-    message( STATUS "In windows" )
     set ( LIB_ARCH "AMD64" )
-    target_link_libraries(${PROJECT_NAME} PUBLIC -static-libgcc -static-libstdc++ godot::cpp) 
-else()
-    target_link_libraries(${PROJECT_NAME} PUBLIC godot::cpp)
 endif()
 
 target_compile_features( ${PROJECT_NAME}
     PRIVATE
         cxx_std_17
 )
+
+if (MSVC)
+    add_compile_options(/W4 /WX)
+else()
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Werror -Wno-use-after-free -Werror=suggest-override)
+endif()
 
 # LIB_ARCH is the architecture being built. It is set to the build system's architecture.
 # For macOS, we build a universal library (both arm64 and x86_64).

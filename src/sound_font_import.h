@@ -19,14 +19,14 @@ public:
     String _get_resource_type();
     float _get_priority();
     int _get_import_order();
-    String _get_save_extension() const;
+    String _get_save_extension() const override;
     TypedArray<Dictionary> _get_import_options(const String &path, int32_t preset_index);
     int _get_preset_count();
 	Error _import(const String &source_file,
                   const String &save_path,
                   const Dictionary &options,
                   const TypedArray<String> &platform_variants,
-                  const TypedArray<String> &gen_files) const;
+                  const TypedArray<String> &gen_files) const override;
 };
 
 class SoundFontPlugin : public EditorPlugin {

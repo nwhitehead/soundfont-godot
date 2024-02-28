@@ -67,7 +67,7 @@ String MidiImportPlugin::_get_save_extension() const {
     return "res";
 }
 
-TypedArray<Dictionary> MidiImportPlugin::_get_import_options(const String &path, int32_t preset_index) {
+TypedArray<Dictionary> MidiImportPlugin::_get_import_options(const String &/*path*/, int32_t /*preset_index*/) {
     TypedArray<Dictionary> result{};
     return result;
 }
@@ -78,9 +78,9 @@ int MidiImportPlugin::_get_preset_count() {
 
 Error MidiImportPlugin::_import(const String &source_file,
                                 const String &save_path,
-                                const Dictionary &options,
-                                const TypedArray<String> &platform_variants,
-                                const TypedArray<String> &gen_files) const {
+                                const Dictionary &/*options*/,
+                                const TypedArray<String> &/*platform_variants*/,
+                                const TypedArray<String> &/*gen_files*/) const {
     // Read in contents of MIDI file
     PackedByteArray data = FileAccess::get_file_as_bytes(source_file);
     // Create empty Midi object

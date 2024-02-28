@@ -338,7 +338,6 @@ void SoundFontPlayer::_physics_process() {
         return;
     }
     float mix_rate = stream->get_mix_rate();
-    float buffer_length = stream->get_buffer_length();
     int available = playback->get_frames_available();
     // Just set max_samples_available on first call
     if (max_samples_available == 0) {
