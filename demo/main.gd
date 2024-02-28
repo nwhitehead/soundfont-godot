@@ -112,3 +112,29 @@ func _input(event):
 			player.channel_note_on(0, 0, base_note + map[k], 1.0)
 		if event.is_action_released(k):
 			player.channel_note_off(0, 0, base_note + map[k])
+
+func play_chord(intervals):
+	var base_note : int = 60
+	var duration : float = 0.5
+	var t = player.get_time()
+	for i in intervals:
+		player.channel_note_on(t, 0, base_note + i, 1.0)
+		player.channel_note_off(t + duration, 0, base_note + i)
+
+func _on_chord_button_pressed():
+	play_chord([0, 4, 7])
+
+func _on_chord_button_2_pressed():
+	play_chord([0, 3, 7])
+
+func _on_chord_button_3_pressed():
+	play_chord([0, 4, 7, 10])
+
+func _on_chord_button_4_pressed():
+	play_chord([0, 4, 7, 11])
+
+func _on_chord_button_5_pressed():
+	play_chord([0, 3, 7, 10])
+
+func _on_chord_button_6_pressed():
+	play_chord([0, 3, 6, 9])

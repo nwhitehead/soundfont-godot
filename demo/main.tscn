@@ -93,7 +93,60 @@ text = "Press keys for piano:
 A  S  D  F  G  H  J  K  L"
 horizontal_alignment = 1
 
+[node name="ChordButton" type="Button" parent="."]
+offset_left = 576.0
+offset_top = 96.0
+offset_right = 704.0
+offset_bottom = 127.0
+text = "C"
+
+[node name="ChordButton2" type="Button" parent="."]
+offset_left = 576.0
+offset_top = 136.0
+offset_right = 704.0
+offset_bottom = 167.0
+text = "Cm
+"
+
+[node name="ChordButton3" type="Button" parent="."]
+offset_left = 576.0
+offset_top = 176.0
+offset_right = 704.0
+offset_bottom = 207.0
+text = "C7
+"
+
+[node name="ChordButton4" type="Button" parent="."]
+offset_left = 576.0
+offset_top = 216.0
+offset_right = 704.0
+offset_bottom = 247.0
+text = "Cmaj7
+"
+
+[node name="ChordButton5" type="Button" parent="."]
+offset_left = 576.0
+offset_top = 256.0
+offset_right = 704.0
+offset_bottom = 287.0
+text = "Cm7
+"
+
+[node name="ChordButton6" type="Button" parent="."]
+offset_left = 576.0
+offset_top = 296.0
+offset_right = 704.0
+offset_bottom = 327.0
+text = "Cdim7
+"
+
 [connection signal="button_down" from="ButtonG" to="." method="_on_button_button_down_g"]
 [connection signal="button_down" from="ButtonC" to="." method="_on_button_button_down_c"]
 [connection signal="toggled" from="ArpToggle" to="." method="_on_arp_toggle_toggled"]
 [connection signal="toggled" from="SongToggle" to="." method="_on_song_toggle_toggled"]
+[connection signal="pressed" from="ChordButton" to="." method="_on_chord_button_pressed"]
+[connection signal="pressed" from="ChordButton2" to="." method="_on_chord_button_2_pressed"]
+[connection signal="pressed" from="ChordButton3" to="." method="_on_chord_button_3_pressed"]
+[connection signal="pressed" from="ChordButton4" to="." method="_on_chord_button_4_pressed"]
+[connection signal="pressed" from="ChordButton5" to="." method="_on_chord_button_5_pressed"]
+[connection signal="pressed" from="ChordButton6" to="." method="_on_chord_button_6_pressed"]
