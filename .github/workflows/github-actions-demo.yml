@@ -47,3 +47,15 @@ jobs:
         name: dist.${{ runner.os }}.${{ matrix.build_type }}
         path: |
           ${{ steps.strings.outputs.build-output-dir }}/soundfont-gdextension
+
+  package:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: dist
+        pattern: dist*
+        merge-multiple: true
+    - run: ls -R dist
