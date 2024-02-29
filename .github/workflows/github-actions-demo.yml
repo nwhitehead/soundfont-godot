@@ -46,7 +46,7 @@ jobs:
       with:
         name: dist.${{ runner.os }}.${{ matrix.build_type }}
         path: |
-          ${{ steps.strings.outputs.build-output-dir }}/soundfont-gdextension
+          ${{ steps.strings.outputs.build-output-dir }}/soundfont
 
   package:
     needs: build
@@ -58,6 +58,12 @@ jobs:
         path: dist
         pattern: dist*
         merge-multiple: true
+    - run: |
+        mv dist soundfont
+        mkdir addons
+        mv soundfont addons
+        mkdir dist
+        mv addons dist
     - run: ls -R dist
     - name: Release archive
       uses: actions/upload-artifact@v4

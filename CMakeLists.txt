@@ -16,7 +16,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable( GDExtension )
 
-project( soundfont-gdextension )
+project( soundfont )
 
 add_library(${PROJECT_NAME} SHARED)
 
