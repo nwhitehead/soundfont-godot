@@ -19,14 +19,17 @@ jobs:
         - name: 🏁 Windows (MSVC)
           os: windows-2019
           build_type: Release
-          c_compiler: cl.exe
-          cxx_compiler: cl.exe
+          c_compiler: cl
+          cxx_compiler: cl
 
         - name: 🍎 macOS
           os: macos-11
           build_type: Release
           c_compiler: clang
           cxx_compiler: clang++
+
+    env:
+      SCCACHE_GHA_ENABLED: "true"
 
     steps:
 
