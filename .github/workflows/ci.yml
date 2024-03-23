@@ -13,14 +13,20 @@ jobs:
         - name: 🐧 Linux (GCC)
           os: ubuntu-20.04
           build_type: Release
+          c_compiler: gcc
+          cxx_compiler: g++
 
         - name: 🏁 Windows (MSVC)
           os: windows-2019
           build_type: Release
+          c_compiler: cl.exe
+          cxx_compiler: cl.exe
 
         - name: 🍎 macOS
           os: macos-11
           build_type: Release
+          c_compiler: clang
+          cxx_compiler: clang++
 
     steps:
 
@@ -43,7 +49,10 @@ jobs:
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.cxx_compiler }}
+        -DCMAKE_C_COMPILER_LAUNCHER=sccache
+        -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
         -G "Ninja"
         -S ${{ github.workspace }}
 
