@@ -3,18 +3,27 @@ run-name: ${{ github.actor }} is building SoundFont Godot extension 🚀
 on: [push]
 jobs:
   build:
+    name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
         build_type: [Release, Debug]
+        include:
+        - name: 🐧 Linux (GCC)
+          os: [ubuntu-20.04]
 
     steps:
 
     - name: Check out repository code
       uses: actions/checkout@v4
+
+    - name: Run sccache-cache
+      uses: mozilla-actions/sccache-action@v0.0.3
+
+    - name: Setup Ninja
+      uses: ashutoshvarma/setup-ninja@master
 
     - name: Set reusable strings
       id: strings
@@ -22,20 +31,12 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-    - name: Use cache for godot-cpp build if available
-      uses: actions/cache@v4
-      with:
-        path: |
-          cache
-          !cache/gdextension-subbuild/CMakeCache.txt
-        key: ${{ runner.os }}.${{ matrix.build_type }}.tests.${{ hashFiles('**/') }}
-        restore-keys: ${{ runner.os }}.${{ matrix.build_type }}.tests.
-
     - name: Configure CMake
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -DFETCHCONTENT_BASE_DIR=${{ github.workspace }}/cache
+        -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
+        -G "Ninja"
         -S ${{ github.workspace }}
 
     - name: Build
