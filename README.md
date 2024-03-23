@@ -21,6 +21,10 @@ Features of this extension:
     audio drivers).
 -   Load and playback MIDI files with full control over notes.
 
+## Releases
+
+CI builds are done by Github Actions.
+
 ## File Formats
 
 SoundFont instruments are normally stored with the `.sf2` file extension. The
