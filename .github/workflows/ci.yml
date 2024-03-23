@@ -11,14 +11,14 @@ jobs:
       matrix:
         build_type: [Release, Debug]
         include:
-        - name: 🐧 Linux (GCC)
-          os: ubuntu-20.04
+          - name: 🐧 Linux (GCC)
+            os: ubuntu-20.04
 
-        - name: 🏁 Windows (MSVC)
-          os: windows-2019
+          - name: 🏁 Windows (MSVC)
+            os: windows-2019
 
-        - name: 🍎 macOS
-          os: macos-11
+          - name: 🍎 macOS
+            os: macos-11
 
     steps:
 
