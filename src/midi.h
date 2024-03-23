@@ -80,6 +80,6 @@ public:
 
 }
 
-VARIANT_ENUM_CAST(Midi::MessageType);
+VARIANT_ENUM_CAST(Midi::MessageType)
 
 #endif
