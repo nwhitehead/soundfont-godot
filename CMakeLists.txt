@@ -8,40 +8,23 @@ set( CMAKE_CXX_STANDARD_REQUIRED ON )
 set( CMAKE_POSITION_INDEPENDENT_CODE ON )
 set( LIB_ARCH ${CMAKE_SYSTEM_PROCESSOR} )
 
-set( GODOT_CPP_VERSION v4.1-binary )
-set( GODOT_CPP_LOCATION https://github.com/nwhitehead/godot-cpp/releases/download/${GODOT_CPP_VERSION} )
-if( APPLE )
-    set( GODOT_CPP_BINARY_URL ${GODOT_CPP_LOCATION}/godot-cpp-macos-universal-release.zip )
-    set( GODOT_CPP_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/_deps/godot_cpp_binary-src/libgodot-cpp.macos.template_release.universal.a" )
-else()
-    if( WIN32 )
-        set( GODOT_CPP_BINARY_URL ${GODOT_CPP_LOCATION}/godot-cpp-windows-msvc2019-x86_64-release.zip )
-        set( GODOT_CPP_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/_deps/godot_cpp_binary-src/libgodot-cpp.windows.template_release.x86_64.lib" )
-    else()
-        set( GODOT_CPP_BINARY_URL ${GODOT_CPP_LOCATION}/godot-cpp-linux-glibc2.27-x86_64-release.zip )
-        set( GODOT_CPP_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/_deps/godot_cpp_binary-src/libgodot-cpp.linux.template_release.x86_64.a" )
-        endif()
-endif()
-set( GODOT_CPP_INCLUDE_URL ${GODOT_CPP_LOCATION}/godot-cpp-include.zip )
-set( GODOT_CPP_LOCAL_INCLUDE_URL ${GODOT_CPP_LOCATION}/godot-cpp-local-include.zip )
-
 include( FetchContent )
-FetchContent_Declare( godot_cpp_binary URL ${GODOT_CPP_BINARY_URL} )
-FetchContent_Declare( godot_cpp_include URL ${GODOT_CPP_INCLUDE_URL} )
-FetchContent_Declare( godot_cpp_local_include URL ${GODOT_CPP_LOCAL_INCLUDE_URL} )
-FetchContent_MakeAvailable( godot_cpp_binary godot_cpp_include godot_cpp_local_include )
+
+FetchContent_Declare(
+        GDExtension
+        GIT_REPOSITORY https://github.com/godotengine/godot-cpp.git
+        GIT_TAG 4.1
+)
+
+FetchContent_MakeAvailable( GDExtension )
 
 project( soundfont )
 
 add_library(${PROJECT_NAME} SHARED)
 
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
-target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/_deps/godot_cpp_include-src/gen/include")
-target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/_deps/godot_cpp_local_include-src/include")
-target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/_deps/godot_cpp_local_include-src/gdextension")
-target_link_libraries(${PROJECT_NAME} ${GODOT_CPP_LIBRARY})
+target_link_libraries(${PROJECT_NAME} PUBLIC godot::cpp) 
 
-#target_link_libraries(${PROJECT_NAME} PUBLIC godot::cpp) 
 if ( "${CMAKE_SYSTEM_NAME}" MATCHES "Windows" )
     set ( LIB_ARCH "AMD64" )
 endif()
